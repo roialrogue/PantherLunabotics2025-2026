@@ -1,0 +1,273 @@
+%% ECBF QP control for double-integrator with multiple circular obstacles
+clear; clc; close all;
+
+% Simulation params
+dt = 0.05;
+tf = 300;
+time = 0:dt:tf;
+
+% System initial condition
+x = [1.0; 1.5; pi/2; 0.0];   % state [x,y,theta,v]
+xx = x;
+m = 2; % number of control inputs [a, w]
+
+% Goal and nominal controller gains
+goal_states = {[1.5; 8.0; 0; 0]
+               [5.38; 0.6; 0; 0]
+               [1.5; 8.0; 0; 0]};   % target position 
+Kp = 3; Kd = 0.1; % Linear PD controller gains
+Kp_theta = 0.50; Kd_theta = 0.1; % Angular PD controller gains
+Kp_pos_ff = 0.1;
+
+% Obstacles: each row -> {center, radius}
+obs = {[0.1;5.0], 0.3;
+       [1.2;1.0], 0.3;
+       [0.2; 10.5], 0.5;
+       [2.0; 10.5], 0.3;
+       [2.3; 5.0], 0.3;
+       [3.4; 4.5], 0.6;
+       [1.6; 2.8], 0.5;
+       [3.3; 10.7], 0.3;
+       [5.5; 4.5], 0.3;
+       [6.0; 6.4], 0.3;
+       [5.8; 10.2], 0.5};
+rob_diam = 0.3;
+
+num_obs = size(obs,1);
+num_cbf = 2;
+
+% ECBF params (h_ddot + a1*h_dot + a2*h >= 0) 
+p1 = 1.0;
+p2 = 1.0;
+a1 = p1 + p2; % (alpha1 >=0 )
+a2 = p1.*p2; % (alpha2 >=0 )
+
+F = [0 1 ; 0 0];
+G = [0;1];
+K = [a2 a1];
+
+% for i = 1:num_obs
+h_dyn = F-G*K;
+eigenvalues = eig(h_dyn);
+fprintf('Eigenvalues for Obs: %s\n', num2str(eigenvalues'));
+% end
+
+% QP slack weight (higher values discourage violation)
+gamma = 1e-4;
+k_qp = 0.0001;
+
+% Control limits
+u_max = 4;
+u_min = -4;
+v_max = 0.3;
+pos_tol = 0.1;
+
+% quadprog options
+opts = optimoptions('quadprog','Display','off');
+
+% Preallocate logs
+Ulog = [];
+Slog = [];
+nu2_log = [];
+error = [];
+
+for j = 1:size(goal_states,1)
+    xs = goal_states{j};
+    % Initialize previous errors
+    e_pos = sqrt((xs(1) - x(1))^2 + (xs(2) - x(2))^2);
+    theta_des = atan2((xs(2) - x(2))^2, (xs(1) - x(1))^2);
+    e_ang = theta_des - x(3);
+    prev_e_ang = 0;
+    error = [error [e_pos; e_ang]];
+    t = 0;
+    
+    while (e_pos > pos_tol) && t < tf
+        dx = xs(1) - x(1);
+        dy = xs(2) - x(2);
+        e_pos = sqrt(dx^2 + dy^2); % distance error
+        theta_des = atan2(dy, dx); % desired heading
+        e_ang = theta_des - x(3);      % heading error
+        e_ang = atan2(sin(e_ang), cos(e_ang)); % wrap to [-pi,pi]
+        v_des = min(v_max, 0.2 * e_pos);
+        e_vel = v_des - x(4);
+    
+        % Derivative of errors
+        e_ang_dot = (e_ang - prev_e_ang)/dt;
+    
+        % PD control
+        a = Kp*e_vel + Kd*e_vel/dt + Kp_pos_ff * e_pos;
+        w = Kp_theta*e_ang + Kd_theta*e_ang_dot;
+        u_nom = [a; w];
+
+        k1 = 0.2;
+        k2 = 1;
+        k3 = 2;
+       
+        phi = theta_des-x(3)+pi;
+        a = -(k1+k3)*x(4) + (1+k1*k3)*e_pos*cos(phi) +k1*(k2*(e_pos)+x(4))*sin(phi)^2;
+        w = (k2+ x(4)/e_pos)*sin(phi);
+        u_nom = [a;w];
+    
+        % Build QP matrices
+        % Decision vector z = [u(2x1); s(mx1)] control input and slack variable
+        % One slack variable for each constraint, 2 cbf per obstacle
+        nz = m + num_cbf * num_obs;
+        % H and f for 0.5*z'Hz + f'z  -> we want (u-u_nom)' W (u-u_nom) + slack_penalty*sum(s^2)
+        H = zeros(nz); % square matrix for quadprog optimisation eqn
+        % Put 2*I on u block, 2*gamma*I on slack block so quadprog's 0.5 factor yields desired cost
+        H(1,1) = 2 * 2;
+        H(2,2) = 2 * 0.01;
+        H(3:end,3:end) = 2*gamma*eye(num_cbf * num_obs);
+    
+        f = zeros(nz,1);    % linear part of quadprog optimisation eqn
+        f(1:2) = -2 * [2 * u_nom(1); 0.01 * u_nom(2)];  % corresponds to -2*u_nom'*u term
+    
+        % Inequalities A_qp * z <= b_qp
+        A_qp = [];
+        b_qp = [];
+    
+        % Loop over each constraint (obstacle)
+        for i = 1:num_obs
+            ci = obs{i,1};
+            ri = obs{i,2} + rob_diam/2;
+    
+            h_d_i = (x(1) - ci(1))^2 + (x(2) - ci(2))^2 - ri^2;
+            h_d_dot = 2*x(4)*cos(x(3))*(x(1) - ci(1))' + 2*x(4)*sin(x(3))*(x(2) - ci(2))';     
+    
+            % putting in form Au >= b
+            A_i = [2*cos(x(3))*(x(1) - ci(1)) + 2*sin(x(3))*(x(2) - ci(2)) 2*x(4)*cos(x(3))*(x(2) - ci(2)) - 2*x(4)*sin(x(3))*(x(1) - ci(1))];
+            % b_i as derived 
+            b_i = - ( 2*(x(4)'*x(4)) + a1 * h_d_dot + a2 * h_d_i );
+    
+            % building QP constraints for quadprog from our CBF constraints
+            % convert a'u - s >= b into: -A_i * u + s_i <= -b_i 
+            Aq_row = [-A_i, zeros(1,num_cbf*num_obs)];
+            Aq_row(m + num_cbf*(i-1) + 1) = 1;      % place 1 for s_i (indexing: 1..2 for u, 3..2+m for s)
+            A_qp = [A_qp; Aq_row];
+            b_qp = [b_qp; -b_i];
+    
+            h_th_i = (x(1) - ci(1))*cos(x(3)) + (x(2) - ci(2))*sin(x(3));
+            
+            A_th_i = [0, cos(x(3))*(x(2) - ci(2)) - sin(x(3))*(x(1) - ci(1))];
+            b_th_i = x(4) + k_qp * h_th_i;
+    
+            Aq_th_row = [-A_th_i, zeros(1,num_cbf*num_obs)];
+            Aq_th_row(m + num_cbf*(i-1) + 2) = 1;
+            A_qp = [A_qp; Aq_th_row];
+            b_qp = [b_qp; b_th_i];
+    
+        end
+    
+        % h_lin = (5/6)*x(1) - x(2) + 0.8;
+        % h_lin_dot = (5/6)*x(4)*cos(x(3)) - x(4)*sin(x(3));
+        % 
+        % % putting in form Au >= b
+        % A_lin = [(5/6)*cos(x(3))-sin(x(3)) -x(4)*(cos(x(3))+(5/6)*sin(x(3)))];
+        % b_lin = -(a1(1)*h_lin_dot + a2(1)*h_lin) - 0.1;
+        % 
+        % Aq_lin_row = [-A_lin, zeros(1,num_cbf*num_obs)];
+        % Aq_lin_row(m + num_cbf*(i-1) + 3) = 1;
+        % A_qp = [A_qp; Aq_lin_row];
+        % b_qp = [b_qp; -b_lin];
+    
+        % bounds: enforce s >= 0 and u limits
+        lb = [u_min*ones(2,1); zeros(num_cbf*num_obs,1)];
+        ub = [u_max*ones(2,1); inf(num_cbf*num_obs,1)];
+    
+        % Solve QP
+        z = quadprog(H,f,A_qp,b_qp,[],[],lb,ub,[],opts);
+        if isempty(z) 
+            warning('quadprog failed at step %d — using u_nom (no safety filter)', k);
+            u = u_nom;
+            s = inf(num_cbf*num_obs,1);
+        else
+            u = z(1:2);
+            s = z(3:end);
+        end
+    
+        % compute nu2 values for logging:
+        for i = 1:num_obs
+            ci = obs{i,1};
+            ri = obs{i,2};
+            h_d_i = (x(1) - ci(1))^2 + (x(2) - ci(2))^2 - ri^2;
+            h_d_dot = 2*x(4)*cos(x(3))*(x(1) - ci(1))' + 2*x(4)*sin(x(3))*(x(2) - ci(2))';
+            hddot_no_u = 2*(x(4)'*x(4));
+            nu2(i) = ([2*cos(x(3))*(x(1) - ci(1)) + 2*sin(x(3))*(x(2) - ci(2)) 2*x(4)*cos(x(3))*(x(2) - ci(2)) - 2*x(4)*sin(x(3))*(x(1) - ci(1))]*u) + (2*(x(4)'*x(4)) + a1*h_d_dot + a2*h_d_i);
+        end
+        nu2_log = [nu2_log; nu2];
+    
+        % Integrate (simple forward Euler)
+        x3_new = x(3) + u(2)*dt;
+        x4_new = x(4) + u(1)*dt;
+        x1_new = x(1) + x4_new*cos(x3_new)*dt;
+        x2_new = x(2) + x4_new*sin(x3_new)*dt;
+        
+        x = [x1_new; x2_new; x3_new; x4_new];
+    
+        % Logging
+        xx = [xx x];
+        error = [error [e_pos; e_ang]];
+        Ulog = [Ulog u];
+        Slog = [Slog s];
+        t = t + dt;
+    end
+    
+    if rem(j,2) ~= 0
+        x(3) = -pi/8;
+        xx(3,end) = -pi/8;
+    else 
+        x(3) = 8*pi/16;
+        xx(3,end) = 8*pi/16;
+    end
+end
+% 
+% xp = -0.5:0.1:1.5;
+% yp = (5/6)*xp + 0.8;
+
+%% Plot results
+figure;
+subplot(2,2,1); hold on; axis equal; grid on;
+plot(xx(1,:), xx(2,:), 'b-', 'LineWidth',1.5);
+for i = 1: size(goal_states,1)
+    goals = goal_states{i};
+    plot(goals(1), goals(2), 'rx','MarkerSize',10,'LineWidth',2);
+end
+% plot(xp, yp, 'r-','LineWidth',1.2);
+theta = linspace(0,2*pi,120);
+for i = 1:num_obs
+    ci = obs{i,1}; ri = obs{i,2}/2;
+    plot(ci(1)+ri*cos(theta), ci(2)+ri*sin(theta), 'r-','LineWidth',1.2);
+    plot(ci(1)+(ri+rob_diam/2)*cos(theta), ci(2)+(ri+rob_diam/2)*sin(theta), 'g:','LineWidth',1.2);
+end
+title('Trajectory'); xlabel('x'); ylabel('y');
+
+% ax = sign(Ulog(1,:).*cos(xx(3,2:end)));
+% ay = sign(Ulog(1,:).*sin(xx(3,2:end)));
+
+subplot(2,2,2);
+plot(0:dt:(size(xx,2)-2)*dt, Ulog(1,:), 0:dt:(size(xx,2)-2)*dt, Ulog(2,:));
+% plot(0:dt:(size(xx,2)-2)*dt, ax, 0:dt:(size(xx,2)-2)*dt, ay,  0:dt:(size(xx,2)-2)*dt, Ulog(2,:));
+legend('$u_x$', '$u_y$', '$u_{\theta}$','interpreter','latex'); xlabel('t'); ylabel('u');
+axis padded
+
+subplot(2,2,3);
+plot(0:dt:(size(xx,2)-2)*dt, Slog');
+xlabel('t'); ylabel('slack s_i'); title('Slack variables');
+
+subplot(2,2,4); hold on;
+for i = 1:num_obs
+    plot(0:dt:(size(xx,2)-2)*dt, nu2_log(:,i));
+end
+yline(0,'k--');
+legend(arrayfun(@(i)sprintf('nu2 obs %d',i),1:num_obs,'UniformOutput',false));
+xlabel('t'); ylabel('\nu_2'); title('\nu_2 values (should stay >= 0)');
+
+
+figure()
+subplot(3,1,1);
+plot(0:dt:(size(xx,2)-1)*dt, error(1,2:end));
+legend('$error_{pos}$','interpreter','latex'); xlabel('t'); ylabel('errors');
+
+subplot(3,1,2);
+plot(0:dt:(size(xx,2)-1)*dt, error(2,2:end));
+legend('$error_{ang}$','interpreter','latex'); xlabel('t'); ylabel('errors')
