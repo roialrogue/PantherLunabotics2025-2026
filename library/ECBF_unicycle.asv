@@ -268,8 +268,8 @@ xlabel('t'); ylabel('\nu_2'); title('\nu_2 values (should stay >= 0)');
 figure()
 subplot(3,1,1);
 plot(0:dt:(size(xx,2)-1)*dt, error(1,:));
-legend('$error_{pos}$','interpreter','latex'); xlabel('t'); ylabel('Position Error [m]');
+legend('$error_{pos}$','interpreter','latex'); xlabel('t'); ylabel('errors');
 
 subplot(3,1,2);
 plot(0:dt:(size(xx,2)-1)*dt, error(2,:));
-legend('$error_{ang}$','interpreter','latex'); xlabel('t'); ylabel('Angular Error [rad]')
+legend('$error_{ang}$','interpreter','latex'); xlabel('t'); ylabel('errors')
