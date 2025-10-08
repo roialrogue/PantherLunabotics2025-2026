@@ -69,6 +69,7 @@ Slog = [];
 nu2_log = [];
 error = [];
 xx = [];
+goals = [];
 t = 0;
 j = 1;
 
@@ -80,6 +81,7 @@ while t < tf
     elseif j == 2
         xs = goal_states{j};
     end
+    goals = [goals xs];
     % Initialize previous errors
     e_pos = sqrt((xs(1) - x(1))^2 + (xs(2) - x(2))^2);
     theta_des = atan2((xs(2) - x(2))^2, (xs(1) - x(1))^2);
@@ -104,14 +106,6 @@ while t < tf
         w = Kp_theta*e_ang + Kd_theta*e_ang_dot;
         u_nom = [a; w];
 
-        % k1 = 0.2;
-        % k2 = 1;
-        % k3 = 2;
-        % 
-        % phi = theta_des-x(3)+pi;
-        % a = -(k1+k3)*x(4) + (1+k1*k3)*e_pos*cos(phi) +k1*(k2*(e_pos)+x(4))*sin(phi)^2;
-        % w = (k2+ x(4)/e_pos)*sin(phi);
-        % u_nom = [a;w];
     
         % Build QP matrices
         % Decision vector z = [u(2x1); s(mx1)] control input and slack variable
@@ -228,9 +222,8 @@ fig = figure;
 ax = subplot(2,2,1, 'Parent', fig);
 hold on; axis equal; grid on;
 plot(ax, xx(1,:), xx(2,:), 'b-', 'LineWidth',1.5);
-for i = 1: size(goal_states,1)
-    goals = goal_states{i};
-    plot(ax, goals(1), goals(2), 'rx','MarkerSize',10,'LineWidth',2);
+for i = 1: size(goals,2)
+    plot(ax, goals(1,i), goals(2,i), 'rx','MarkerSize',10,'LineWidth',2);
 end
 % plot(xp, yp, 'r-','LineWidth',1.2);
 theta = linspace(0,2*pi,120);
