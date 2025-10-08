@@ -16,21 +16,20 @@ goal_states = {[1.5; 8.0; 0; 0]
                [5.38; 0.6; 0; 0]
                [1.5; 8.0; 0; 0]};   % target position 
 Kp = 3; Kd = 0.1; % Linear PD controller gains
-Kp_theta = 0.50; Kd_theta = 0.1; % Angular PD controller gains
-Kp_pos_ff = 0.1;
+Kp_theta = 3.0; Kd_theta = 0.6; % Angular PD controller gains
+Kp_pos_ff = 0.2;
 
-% Obstacles: each row -> {center, radius}
-obs = {[0.1;5.0], 0.3;
-       [1.2;1.0], 0.3;
-       [0.2; 10.5], 0.5;
-       [2.0; 10.5], 0.3;
-       [2.3; 5.0], 0.3;
-       [3.4; 4.5], 0.6;
-       [1.6; 2.8], 0.5;
-       [3.3; 10.7], 0.3;
-       [5.5; 4.5], 0.3;
-       [6.0; 6.4], 0.3;
-       [5.8; 10.2], 0.5};
+% Obstacles: 
+exclusion_zones = [
+    struct('xlim', [0.0, 2.0], 'ylim', [0.0, 2.0]);  % bottom-left
+    struct('xlim', [3.5, 6.88], 'ylim', [0.0, 1.5]);   % middle block
+];
+xlim_box = [0, 6.88];
+ylim_box = [0, 11];
+obs = randomiseObstacles(10,xlim_box,ylim_box,exclusion_zones);
+% center_pole = {struct('bx', 3.4, 'by', 4.5, 'ax', 0.3, 'ay', 0.3, 'cj', 1, 'p', 20)};
+obs(end+1,:) = {[3.4; 4.5], 0.6};
+
 rob_diam = 0.3;
 
 num_obs = size(obs,1);
@@ -54,12 +53,12 @@ fprintf('Eigenvalues for Obs: %s\n', num2str(eigenvalues'));
 
 % QP slack weight (higher values discourage violation)
 gamma = 1e-4;
-k_qp = 0.0001;
+k_qp = 0.01;
 
 % Control limits
 u_max = 4;
 u_min = -4;
-v_max = 0.3;
+v_max = 0.2;
 pos_tol = 0.1;
 
 % quadprog options
@@ -99,14 +98,14 @@ for j = 1:size(goal_states,1)
         w = Kp_theta*e_ang + Kd_theta*e_ang_dot;
         u_nom = [a; w];
 
-        k1 = 0.2;
-        k2 = 1;
-        k3 = 2;
-       
-        phi = theta_des-x(3)+pi;
-        a = -(k1+k3)*x(4) + (1+k1*k3)*e_pos*cos(phi) +k1*(k2*(e_pos)+x(4))*sin(phi)^2;
-        w = (k2+ x(4)/e_pos)*sin(phi);
-        u_nom = [a;w];
+        % k1 = 0.2;
+        % k2 = 1;
+        % k3 = 2;
+        % 
+        % phi = theta_des-x(3)+pi;
+        % a = -(k1+k3)*x(4) + (1+k1*k3)*e_pos*cos(phi) +k1*(k2*(e_pos)+x(4))*sin(phi)^2;
+        % w = (k2+ x(4)/e_pos)*sin(phi);
+        % u_nom = [a;w];
     
         % Build QP matrices
         % Decision vector z = [u(2x1); s(mx1)] control input and slack variable
@@ -146,15 +145,15 @@ for j = 1:size(goal_states,1)
             A_qp = [A_qp; Aq_row];
             b_qp = [b_qp; -b_i];
     
-            h_th_i = (x(1) - ci(1))*cos(x(3)) + (x(2) - ci(2))*sin(x(3));
-            
-            A_th_i = [0, cos(x(3))*(x(2) - ci(2)) - sin(x(3))*(x(1) - ci(1))];
-            b_th_i = x(4) + k_qp * h_th_i;
-    
-            Aq_th_row = [-A_th_i, zeros(1,num_cbf*num_obs)];
-            Aq_th_row(m + num_cbf*(i-1) + 2) = 1;
-            A_qp = [A_qp; Aq_th_row];
-            b_qp = [b_qp; b_th_i];
+            % h_th_i = (x(1) - ci(1))*cos(x(3)) + (x(2) - ci(2))*sin(x(3));
+            % 
+            % A_th_i = [0, cos(x(3))*(x(2) - ci(2)) - sin(x(3))*(x(1) - ci(1))];
+            % b_th_i = x(4) + k_qp * h_th_i;
+            % 
+            % Aq_th_row = [-A_th_i, zeros(1,num_cbf*num_obs)];
+            % Aq_th_row(m + num_cbf*(i-1) + 2) = 1;
+            % A_qp = [A_qp; Aq_th_row];
+            % b_qp = [b_qp; b_th_i];
     
         end
     
@@ -212,34 +211,27 @@ for j = 1:size(goal_states,1)
         t = t + dt;
     end
     
-    if rem(j,2) ~= 0
-        x(3) = -pi/8;
-        xx(3,end) = -pi/8;
-    else 
-        x(3) = 8*pi/16;
-        xx(3,end) = 8*pi/16;
-    end
 end
-% 
-% xp = -0.5:0.1:1.5;
-% yp = (5/6)*xp + 0.8;
 
 %% Plot results
-figure;
-subplot(2,2,1); hold on; axis equal; grid on;
-plot(xx(1,:), xx(2,:), 'b-', 'LineWidth',1.5);
+fig = figure;
+ax = subplot(2,2,1, 'Parent', fig);
+hold on; axis equal; grid on;
+plot(ax, xx(1,:), xx(2,:), 'b-', 'LineWidth',1.5);
 for i = 1: size(goal_states,1)
     goals = goal_states{i};
-    plot(goals(1), goals(2), 'rx','MarkerSize',10,'LineWidth',2);
+    plot(ax, goals(1), goals(2), 'rx','MarkerSize',10,'LineWidth',2);
 end
 % plot(xp, yp, 'r-','LineWidth',1.2);
 theta = linspace(0,2*pi,120);
 for i = 1:num_obs
     ci = obs{i,1}; ri = obs{i,2}/2;
-    plot(ci(1)+ri*cos(theta), ci(2)+ri*sin(theta), 'r-','LineWidth',1.2);
-    plot(ci(1)+(ri+rob_diam/2)*cos(theta), ci(2)+(ri+rob_diam/2)*sin(theta), 'g:','LineWidth',1.2);
+    plot(ax, ci(1)+ri*cos(theta), ci(2)+ri*sin(theta), 'r-','LineWidth',1.2);
+    plot(ax, ci(1)+(ri+rob_diam/2)*cos(theta), ci(2)+(ri+rob_diam/2)*sin(theta), 'g:','LineWidth',1.2);
 end
 title('Trajectory'); xlabel('x'); ylabel('y');
+
+% plot_square_obstacles({struct('bx', 3.44, 'by', 5.5, 'ax', 0.2907, 'ay', 0.1818, 'cj', 1, 'p', 20)},ax)
 
 % ax = sign(Ulog(1,:).*cos(xx(3,2:end)));
 % ay = sign(Ulog(1,:).*sin(xx(3,2:end)));
@@ -265,9 +257,9 @@ xlabel('t'); ylabel('\nu_2'); title('\nu_2 values (should stay >= 0)');
 
 figure()
 subplot(3,1,1);
-plot(0:dt:(size(xx,2)-1)*dt, error(1,2:end));
+plot(0:dt:(size(xx,2))*dt, error(1,2:end));
 legend('$error_{pos}$','interpreter','latex'); xlabel('t'); ylabel('errors');
 
 subplot(3,1,2);
-plot(0:dt:(size(xx,2)-1)*dt, error(2,2:end));
+plot(0:dt:(size(xx,2))*dt, error(2,2:end));
 legend('$error_{ang}$','interpreter','latex'); xlabel('t'); ylabel('errors')
