@@ -1,2 +1,0 @@
-Jetson.GPIO==2.1.6
-pkg-resources==0.0.0
