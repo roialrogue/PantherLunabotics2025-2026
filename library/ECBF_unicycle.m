@@ -1,5 +1,6 @@
+function ECBF_unicycle()
+%#codegen
 %% ECBF QP control for double-integrator with multiple circular obstacles
-clear; clc; close all;
 
 % Simulation params
 dt = 0.05;
@@ -8,7 +9,7 @@ time = 0:dt:tf;
 
 % System initial condition
 x = [1.0; 1.5; pi/2; 0.0];   % state [x,y,theta,v]
-
+nx = size(x,1);
 m = 2; % number of control inputs [a, w]
 
 % Goal and nominal controller gains
@@ -25,14 +26,23 @@ exclusion_zones = [
 ];
 xlim_box = [0, 6.88];
 ylim_box = [0, 11];
-obs = randomiseObstacles(10,xlim_box,ylim_box,exclusion_zones);
+num_obs = 11;
+obs = cell(num_obs,2);
+for i = 1:num_obs
+    obs{i,1} = zeros(1,2); % center (x,y)
+    obs{i,2} = 0.0;        % radius
+end
+obs = randomiseObstacles(num_obs-1,xlim_box,ylim_box,exclusion_zones,obs);
 % center_pole = {struct('bx', 3.4, 'by', 4.5, 'ax', 0.3, 'ay', 0.3, 'cj', 1, 'p', 20)};
-obs(end+1,:) = {[3.4; 4.5], 0.6};
+obs{num_obs,1} = [3.4, 4.5];
+obs{num_obs,2} = 0.6;
 
 rob_diam = 0.3;
-
-num_obs = size(obs,1);
 num_cbf = 2;
+
+% Decision vector z = [u(2x1); s(mx1)] control input and slack variable
+% One slack variable for each constraint, 2 cbf per obstacle
+nz = m + num_cbf * num_obs;
 
 % ECBF params (h_ddot + a1*h_dot + a2*h >= 0) 
 p1 = 1.0;
@@ -61,31 +71,42 @@ v_max = 0.2;
 pos_tol = 0.1;
 
 % quadprog options
-opts = optimoptions('quadprog','Display','off');
+opts = optimoptions('quadprog','Display','off','Algorithm','active-set');
 
 % Preallocate logs
-Ulog = [];
-Slog = [];
-nu2_log = [];
-error = [];
-xx = [];
-goals = [];
+Ulog = zeros(m,size(time,2)-1);
+Slog = zeros(nz-m,size(time,2)-1);
+nu2_log = zeros(num_obs,size(time,2)-1);
+error = zeros(2,size(time,2)-1);
+xx = zeros(nx,size(time,2)-1);
+A_qp = zeros(num_obs,nz);
+b_qp = zeros(num_obs,1);
+
+goals = zeros(nx,15);
 t = 0;
 j = 1;
+itr = 1;
+goal_itr = 1;
 
 while t < tf
     if j == 1
-        xs = goal_states{j};
-        xs(1) = xs(1) + rand() - 0.5;
-        xs(2) = xs(2) + 2*(rand()- 0.5);
-    elseif j == 2
+        good_goal = false;
+        while ~good_goal
+            xs = goal_states{j};
+            xs(1) = xs(1) + rand() - 0.5;
+            xs(2) = xs(2) + 2*(rand()- 0.5);
+            
+            if sqrt((xs(1) - x(1))^2 + (xs(2) - x(2))^2) < 0.8
+                good_goal = false;
+            else 
+                good_goal = true;
+            end
+        end
+    else
         xs = goal_states{j};
     end
-    goals = [goals xs];
-    % Initialize previous errors
+    goals(:,goal_itr) = xs;
     e_pos = sqrt((xs(1) - x(1))^2 + (xs(2) - x(2))^2);
-    theta_des = atan2((xs(2) - x(2))^2, (xs(1) - x(1))^2);
-    e_ang = theta_des - x(3);
     prev_e_ang = 0;
 
     while (e_pos > pos_tol) && t < tf
@@ -108,9 +129,7 @@ while t < tf
 
     
         % Build QP matrices
-        % Decision vector z = [u(2x1); s(mx1)] control input and slack variable
-        % One slack variable for each constraint, 2 cbf per obstacle
-        nz = m + num_cbf * num_obs;
+      
         % H and f for 0.5*z'Hz + f'z  -> we want (u-u_nom)' W (u-u_nom) + slack_penalty*sum(s^2)
         H = zeros(nz); % square matrix for quadprog optimisation eqn
         % Put 2*I on u block, 2*gamma*I on slack block so quadprog's 0.5 factor yields desired cost
@@ -122,8 +141,6 @@ while t < tf
         f(1:2) = -2 * [2 * u_nom(1); 0.01 * u_nom(2)];  % corresponds to -2*u_nom'*u term
     
         % Inequalities A_qp * z <= b_qp
-        A_qp = [];
-        b_qp = [];
     
         % Loop over each constraint (obstacle)
         for i = 1:num_obs
@@ -142,8 +159,8 @@ while t < tf
             % convert a'u - s >= b into: -A_i * u + s_i <= -b_i 
             Aq_row = [-A_i, zeros(1,num_cbf*num_obs)];
             Aq_row(m + num_cbf*(i-1) + 1) = 1;      % place 1 for s_i (indexing: 1..2 for u, 3..2+m for s)
-            A_qp = [A_qp; Aq_row];
-            b_qp = [b_qp; -b_i];
+            A_qp(i,:) = Aq_row;
+            b_qp(i,:) = -b_i;
     
             % h_th_i = (x(1) - ci(1))*cos(x(3)) + (x(2) - ci(2))*sin(x(3));
             % 
@@ -174,9 +191,10 @@ while t < tf
         ub = [u_max*ones(2,1); inf(num_cbf*num_obs,1)];
     
         % Solve QP
-        z = quadprog(H,f,A_qp,b_qp,[],[],lb,ub,[],opts);
+        z0 = zeros(nz,1);
+        z = quadprog(H,f,A_qp,b_qp,[],[],lb,ub,z0,opts);
         if isempty(z) 
-            warning('quadprog failed at step %d — using u_nom (no safety filter)', k);
+            warning('quadprog failed at time %d — using u_nom (no safety filter)', t);
             u = u_nom;
             s = inf(num_cbf*num_obs,1);
         else
@@ -185,15 +203,15 @@ while t < tf
         end
     
         % compute nu2 values for logging:
+        nu2 = zeros(num_obs,1);
         for i = 1:num_obs
             ci = obs{i,1};
             ri = obs{i,2};
             h_d_i = (x(1) - ci(1))^2 + (x(2) - ci(2))^2 - ri^2;
             h_d_dot = 2*x(4)*cos(x(3))*(x(1) - ci(1))' + 2*x(4)*sin(x(3))*(x(2) - ci(2))';
-            hddot_no_u = 2*(x(4)'*x(4));
             nu2(i) = ([2*cos(x(3))*(x(1) - ci(1)) + 2*sin(x(3))*(x(2) - ci(2)) 2*x(4)*cos(x(3))*(x(2) - ci(2)) - 2*x(4)*sin(x(3))*(x(1) - ci(1))]*u) + (2*(x(4)'*x(4)) + a1*h_d_dot + a2*h_d_i);
         end
-        nu2_log = [nu2_log; nu2];
+        nu2_log(:,itr) = nu2;
     
         % Integrate (simple forward Euler)
         x3_new = x(3) + u(2)*dt;
@@ -204,33 +222,43 @@ while t < tf
         x = [x1_new; x2_new; x3_new; x4_new];
     
         % Logging
-        xx = [xx x];
-        error = [error [e_pos; e_ang]];
-        Ulog = [Ulog u];
-        Slog = [Slog s];
+        xx(:,itr) = x;
+        error(:,itr) = [e_pos; e_ang];
+        Ulog(:,itr) = u;
+        Slog(:,itr) = s;
         t = t + dt;
+        itr = itr + 1;
     end
     if j == 1
         j = 2;
     elseif j == 2
         j = 1;
     end
+    
+    goal_itr = goal_itr + 1;
+
 end
 
+% trim 
+goals = goals(:, 1:goal_itr-1);
+
 %% Plot results
-fig = figure;
-ax = subplot(2,2,1, 'Parent', fig);
+figure
+ax = gca;
 hold on; axis equal; grid on;
+plot(ax,xx(1,1), xx(2,1),'g^', 'MarkerSize', 10)
 plot(ax, xx(1,:), xx(2,:), 'b-', 'LineWidth',1.5);
 for i = 1: size(goals,2)
     plot(ax, goals(1,i), goals(2,i), 'rx','MarkerSize',10,'LineWidth',2);
 end
-% plot(xp, yp, 'r-','LineWidth',1.2);
 theta = linspace(0,2*pi,120);
+for i = 1:50:size(xx,2)
+    plot(ax, xx(1,i)+rob_diam/2*cos(theta), xx(2,i)+rob_diam/2*sin(theta), 'g:', 'LineWidth',1.5);
+end
+
 for i = 1:num_obs
     ci = obs{i,1}; ri = obs{i,2}/2;
     plot(ax, ci(1)+ri*cos(theta), ci(2)+ri*sin(theta), 'r-','LineWidth',1.2);
-    plot(ax, ci(1)+(ri+rob_diam/2)*cos(theta), ci(2)+(ri+rob_diam/2)*sin(theta), 'g:','LineWidth',1.2);
 end
 title('Trajectory'); xlabel('x'); ylabel('y');
 
@@ -238,31 +266,39 @@ title('Trajectory'); xlabel('x'); ylabel('y');
 
 % ax = sign(Ulog(1,:).*cos(xx(3,2:end)));
 % ay = sign(Ulog(1,:).*sin(xx(3,2:end)));
-
-subplot(2,2,2);
+figure
+subplot(2,2,1);
 plot(0:dt:(size(xx,2)-1)*dt, Ulog(1,:), 0:dt:(size(xx,2)-1)*dt, Ulog(2,:));
 % plot(0:dt:(size(xx,2)-2)*dt, ax, 0:dt:(size(xx,2)-2)*dt, ay,  0:dt:(size(xx,2)-2)*dt, Ulog(2,:));
 legend('$u_a$', '$u_{\theta}$','interpreter','latex'); xlabel('t'); ylabel('u');
 axis padded
 
-subplot(2,2,3);
+subplot(2,2,2);
 plot(0:dt:(size(xx,2)-1)*dt, Slog');
 xlabel('t'); ylabel('slack s_i'); title('Slack variables');
 
-subplot(2,2,4); hold on;
+subplot(2,2,3); hold on;
 for i = 1:num_obs
-    plot(0:dt:(size(xx,2)-1)*dt, nu2_log(:,i));
+    plot(0:dt:(size(xx,2)-1)*dt, nu2_log(i,:));
 end
 yline(0,'k--');
 legend(arrayfun(@(i)sprintf('nu2 obs %d',i),1:num_obs,'UniformOutput',false));
 xlabel('t'); ylabel('\nu_2'); title('\nu_2 values (should stay >= 0)');
 
 
-figure()
-subplot(3,1,1);
-plot(0:dt:(size(xx,2)-1)*dt, error(1,:));
-legend('$error_{pos}$','interpreter','latex'); xlabel('t'); ylabel('Position Error [m]');
+subplot(2,2,4)
+t = 0:dt:(size(xx,2)-1)*dt;
 
-subplot(3,1,2);
-plot(0:dt:(size(xx,2)-1)*dt, error(2,:));
-legend('$error_{ang}$','interpreter','latex'); xlabel('t'); ylabel('Angular Error [rad]')
+yyaxis left
+plot(t, error(1,:), 'LineWidth', 1.5);
+ylabel('Position Error [m]', 'Interpreter', 'latex');
+legend('$error_{pos}$','Interpreter','latex', 'Location', 'best');
+
+yyaxis right
+plot(t, error(2,:), '--', 'LineWidth', 1.5);
+ylabel('Angular Error [rad]', 'Interpreter', 'latex');
+legend('$error_{ang}$','Interpreter','latex', 'Location', 'best');
+
+xlabel('t [s]', 'Interpreter','latex');
+grid on;
+title('Position and Angular Error vs Time');

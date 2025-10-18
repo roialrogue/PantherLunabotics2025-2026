@@ -1,4 +1,4 @@
-function obstacles = randomiseObstacles(num_obs, xlim_box, ylim_box, exclusion_zones)
+function obstacles = randomiseObstacles(num_obs, xlim_box, ylim_box, exclusion_zones,obstacles)
 % RANDOMIZEOBSTACLESRECT Generate random obstacles avoiding rectangular zones.
 %
 %   obstacles = randomizeObstaclesRect(num_obs, xlim_box, ylim_box, exclusion_zones)
@@ -13,7 +13,6 @@ function obstacles = randomiseObstacles(num_obs, xlim_box, ylim_box, exclusion_z
 %       obstacles: cell array of { [x; y], radius }
 
     rng('shuffle'); % randomize seed
-    obstacles = cell(num_obs, 2);
 
     % Half small radius, half large
     small_r = 0.3;
