@@ -12,8 +12,8 @@ class InputListener:
 
     def start(self):
         self.running = True
-        t = threading.Thread(target=self._run, daemon=True)
-        t.start()
+        # t = threading.Thread(target=self._run, daemon=True)
+        # t.start()
 
     def _run(self):
         pygame.init()

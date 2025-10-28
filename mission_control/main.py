@@ -1,7 +1,7 @@
 import time
 import socket
-from autonomous_controller import AutonomousController
-from teleop_controller import TeleopController
+from onboard_software.autonomous_controller import AutonomousController
+from onboard_software.teleop_controller import TeleopController
 from input_listener import InputListener
 
 class Supervisor:

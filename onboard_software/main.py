@@ -11,7 +11,7 @@ class Supervisor:
 
         self.listener = InputListener()
         self.listener.set_callback(self.toggle_mode)
-        self.listener.start()
+        self.listener._run()
 
     def toggle_mode(self):
         if self.mode == "AUTO":
@@ -26,10 +26,11 @@ class Supervisor:
             self.mode = "AUTO"
 
     def run(self):
-        print("[SUPERVISOR] Starting in AUTO mode")
-        self.auto_ctrl.start()
+        print("[SUPERVISOR] Starting in TELEOP mode")
+        self.teleop_ctrl.start()
 
         while True:
+            
             if self.mode == "AUTO":
                 self.auto_ctrl.run_step()
             else:
