@@ -59,13 +59,6 @@ class Supervisor:
 
         while True:
             pygame.event.pump()                  # Update joystick state
-            x = self.joystick.get_axis(0)        # forward and reverse (Left Stick up and down)
-            y = self.joystick.get_axis(1)        # strafe left and right (Left Stick left and right)
-            yaw_rate = self.joystick.get_axis(2) # yaw angle rate (Right Stick left and right)
-            start_mining_motor = self.joystick.get_button(4) # start mining belt motor (LB)
-            stop_mining_motor = self.joystick.get_button(5)  # stop mining belt motor (RB)
-            start_dumping_motor = self.joystick.get_axis(4)  # start mining belt motor (LT)
-            stop_dumping_motor = self.joystick.get_axis(5)   # stop mining belt motor (RT)
 
             teleop_switch = self.joystick.get_button(0)
             auto_switch = self.joystick.get_button(1)
@@ -76,9 +69,22 @@ class Supervisor:
             elif auto_switch & (self.mode != "AUTO"):
                 self.server.command_queue.put("SWITCH TO AUTONOMOUS")
                 self.mode = "AUTO"
+
+            if self.mode == "TELEOP":
+                x = self.joystick.get_axis(0)        # forward and reverse (Left Stick up and down)
+                y = self.joystick.get_axis(1)        # strafe left and right (Left Stick left and right)
+                yaw_rate = self.joystick.get_axis(2) # yaw angle rate (Right Stick left and right)
+                start_mining_motor = self.joystick.get_button(4) # start mining belt motor (LB)
+                stop_mining_motor = self.joystick.get_button(5)  # stop mining belt motor (RB)
+                start_dumping_motor = self.joystick.get_axis(4)  # start mining belt motor (LT)
+                stop_dumping_motor = self.joystick.get_axis(5)   # stop mining belt motor (RT)
+                
+                self.commands = [x, y, yaw_rate, start_mining_motor, stop_mining_motor, start_dumping_motor, stop_dumping_motor]
+                self.server.command_queue.put(self.commands)
+                time.sleep(0.1)
             
-            print(f"[TELEOP] Joystick axes: x={x:.2f}, y={y:.2f}")
-            time.sleep(0.1)
+            # print(f"[TELEOP] Joystick axes: x={x:.2f}, y={y:.2f}")
+            # time.sleep(0.1)
 
 if __name__ == "__main__":
     Supervisor().run()
