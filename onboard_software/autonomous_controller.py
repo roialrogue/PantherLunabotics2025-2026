@@ -1,4 +1,5 @@
 import time
+import random
 
 class AutonomousController:
     def __init__(self):
@@ -17,4 +18,7 @@ class AutonomousController:
         if not self.active:
             return
         print("[AUTO] Running autonomous step...")
+
         time.sleep(0.5)  # Simulate processing
+        telem = random.sample(range(1, 101), 2)
+        return telem
