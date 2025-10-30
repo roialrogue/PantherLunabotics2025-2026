@@ -1,6 +1,6 @@
 import time
 import pygame
-from Server import Server
+from server import Server
 
 '''
 Axis 0 - Left Stick (L = -1, R = 1)
