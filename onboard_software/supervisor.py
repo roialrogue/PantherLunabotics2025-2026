@@ -1,5 +1,5 @@
-from onboard_software.autonomous import AutonomousController
-from onboard_software.teleop import TeleopController
+from autonomous import AutonomousController
+from teleop import TeleopController
 from client import Client
 import queue
 

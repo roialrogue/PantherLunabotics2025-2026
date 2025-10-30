@@ -1,6 +1,5 @@
 import time
 import random
-from onboard_software.autonomous import AutonomousController
 
 '''
 Axis 0 - Left Stick (L = -1, R = 1)

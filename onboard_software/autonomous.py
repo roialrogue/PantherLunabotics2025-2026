@@ -1,6 +1,5 @@
 import time
 import random
-from onboard_software.teleop import TeleopController
 
 class AutonomousController:
     def __init__(self):
