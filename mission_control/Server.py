@@ -7,7 +7,7 @@ class Server:
     def __init__(self):
         self.server = socket.socket()
         port = 6767
-        self.server.bind(('10.154.8.96',port))
+        self.server.bind(('10.154.21.65',port))
         print("Socket binded to %s" %(port))
 
         self.server.listen(5)
