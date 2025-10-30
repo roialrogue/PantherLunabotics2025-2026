@@ -48,7 +48,6 @@ class Server:
                     self.telemetry_queue.put(msg)
                     print(f"[SERVER] Received: {self.telemetry_queue.get()}")
 
-                        
             data = self.client.recv(1024)  # blocking is fine here
             if data:
                 self.telemetry_queue.put(data.decode())
