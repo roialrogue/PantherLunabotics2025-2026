@@ -21,7 +21,6 @@ Button 6 - Options
 Button 7 - Start
 '''
 
-
 class Supervisor:
     def __init__(self):
         self.mode = None
@@ -58,7 +57,7 @@ class Supervisor:
                         self.server.command_queue.put("AUTONOMOUS START")
 
         while True:
-            pygame.event.pump()                  # Update joystick state
+            pygame.event.pump() # Update joystick state
 
             teleop_switch = self.joystick.get_button(0)
             auto_switch = self.joystick.get_button(1)
@@ -70,15 +69,28 @@ class Supervisor:
                 self.server.command_queue.put("SWITCH TO AUTONOMOUS")
                 self.mode = "AUTO"
 
+            #I would do it this way but up to you it would replace (62-70)
+            # if event.type == pygame.JOYBUTTONDOWN and self.joystick.get_button(6):
+            #     if self.mode != "TELEOP":
+            #         self.server.command_queue.put("SWITCH TO TELEOP")
+            #         self.mode = "TELEOP"
+            #     else:
+            #         self.server.command_queue.put("SWITCH TO AUTONOMOUS")
+            #         self.mode = "AUTO"
+
             if self.mode == "TELEOP":
                 x = self.joystick.get_axis(0)        # forward and reverse (Left Stick up and down)
                 y = self.joystick.get_axis(1)        # strafe left and right (Left Stick left and right)
                 yaw_rate = self.joystick.get_axis(2) # yaw angle rate (Right Stick left and right)
-                start_mining_motor = self.joystick.get_button(4) # start mining belt motor (LB)
-                stop_mining_motor = self.joystick.get_button(5)  # stop mining belt motor (RB)
-                start_dumping_motor = self.joystick.get_axis(4)  # start mining belt motor (LT)
-                stop_dumping_motor = self.joystick.get_axis(5)   # stop mining belt motor (RT)
-                
+                if event.type == pygame.JOYBUTTONDOWN:
+                    # I would also do this a toggle but up to you
+                    # I dont know how using the same button on the same section of code would work
+                    # They would both fire at the same time
+                    start_mining_motor = self.joystick.get_button(4) # start mining belt motor (LB)
+                    stop_mining_motor = self.joystick.get_button(5)  # stop mining belt motor (RB)
+                    start_dumping_motor = self.joystick.get_axis(4)  # start mining belt motor (LT)
+                    stop_dumping_motor = self.joystick.get_axis(5)   # stop mining belt motor (RT)
+
                 self.commands = [x, y, yaw_rate, start_mining_motor, stop_mining_motor, start_dumping_motor, stop_dumping_motor]
                 self.server.command_queue.put(self.commands)
                 time.sleep(0.1)
