@@ -1,7 +1,5 @@
-import time
-from autonomous_controller import AutonomousController
-from teleop_controller import TeleopController
-# from input_listener import InputListener
+from onboard_software.autonomous import AutonomousController
+from onboard_software.teleop import TeleopController
 from client import Client
 import queue
 
@@ -15,22 +13,20 @@ class Robot:
 
         data = self.client.cmd_input_queue.get()
         if data == "TELEOP START":
-            self.auto_ctrl.stop()
             self.teleop_ctrl.start()
             self.mode = "TELEOP"
         elif data == "AUTONOMOUS START":
-            self.teleop_ctrl.stop()
             self.auto_ctrl.start()
             self.mode = "AUTO"
 
 
-    def toggle_mode(self):
-        if self.mode == "AUTO":
+    def toggle_mode(self, data):
+        if self.mode == "AUTO" and data == "SWITCH TO TELEOP":
             print("[SUPERVISOR] Switching to TELEOP")
             self.auto_ctrl.stop()
             self.teleop_ctrl.start()
             self.mode = "TELEOP"
-        else:
+        elif self.mode == "TELEOP" and data == "SWITCH TO AUTONOMOUS":
             print("[SUPERVISOR] Switching to AUTO")
             self.teleop_ctrl.stop()
             self.auto_ctrl.start()
@@ -45,12 +41,11 @@ class Robot:
                 except queue.Empty:
                     data = None
 
-                if data == "SWITCH TO TELEOP":
-                    self.toggle_mode()
-                elif data == "SWITCH TO AUTONOMOUS":
-                    self.toggle_mode()
-                elif self.mode == "AUTO":
-                    telem = self.auto_ctrl.run_step()
+                self.toggle_mode(data)
+
+                if self.mode == "AUTO":
+                    cmd = data
+                    telem = self.auto_ctrl.run_step(cmd)
                     self.client.telem_output_queue.put(telem)
                 elif self.mode == "TELEOP":
                     cmd = data
