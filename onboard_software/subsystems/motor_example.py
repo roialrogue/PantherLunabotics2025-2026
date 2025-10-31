@@ -2,8 +2,7 @@ import RPi.GPIO as GPIO
 import library.pid_controller as Controller
 import library.motor as Motor
 
-class motor_example:
-    
+class motor_example: 
     def __init__(self):
         self.pid_coefficients = Controller.PIDController.PIDCoefficients(kp=0, ki=0, kd=0)
         self.pin = 33

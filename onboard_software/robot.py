@@ -2,11 +2,17 @@ from autonomous import AutonomousController
 from teleop import TeleopController
 from client import Client
 import queue
+import RPi.GPIO as GPIO
+from subsystems.motor_example import motor_example as motor_subsystem
+
+
 
 class Robot:
     def __init__(self):
         self.auto_ctrl = AutonomousController()
         self.teleop_ctrl = TeleopController()
+        GPIO.setmode(GPIO.BOARD)
+        self.subsystem_motor = motor_subsystem()
 
         self.client = Client()
         self.client.start()
@@ -45,7 +51,7 @@ class Robot:
 
                 if self.mode == "AUTO":
                     cmd = data
-                    telem = self.auto_ctrl.run_step(cmd)
+                    telem = self.auto_ctrl.run_step(self.subsystem_motor, cmd)
                     self.client.telem_output_queue.put(telem)
                 elif self.mode == "TELEOP":
                     cmd = data

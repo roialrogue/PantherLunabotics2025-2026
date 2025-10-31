@@ -1,5 +1,6 @@
 import time
 import random
+import robot
 
 '''
 Axis 0 - Left Stick (L = -1, R = 1)
@@ -36,6 +37,9 @@ class TeleopController:
         """Read joystick state and convert to control commands."""
         if not self.active:
             return
+        
+        x = cmd[0]
+        robot.motor_subsystem.set_power(x)
 
         telem = random.sample(range(1, 101), 6)
         
