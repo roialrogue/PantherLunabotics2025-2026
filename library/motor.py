@@ -24,3 +24,6 @@ class Motor:
 
         print(f"Power: {power:.2f} | Pulse: {pulse:.1f} µs | Duty: {duty_cycle:.2f}%")
         return duty_cycle
+    
+    def get_frequency(self):
+        return self.hz
