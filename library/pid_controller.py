@@ -129,6 +129,9 @@ class PIDController:
         elif (settlingTime == 0.0 or current_time >= self.settlingStartTime + settlingTime):
             onTarget = True
 
+        print(f"OnTarget: {onTarget} | Error: {abs_error} | Tolerance: {tolerance} | currentTime: {current_time}")
+        print(f"SettlingTime: {settlingTime} | SettlingStartTime: {self.settlingStartTime}")
+        print(f"timeout: {self.timeout} | timeoutStartTime: {self.timeoutStartTime}")
         if onTarget: self.resetTimeout()
         return onTarget
     
@@ -163,6 +166,7 @@ class PIDController:
         F_Term = self.kf * target
 
         self.output = Util.clip(P_Term + I_Term + D_Term + F_Term, -self.output_limit, self.output_limit)
+        print(f"Output: {self.output} P: {P_Term:.3f} | I: {I_Term:.3f} | D: {D_Term:.3f} | F: {F_Term:.3f}")
 
         return self.output
     
