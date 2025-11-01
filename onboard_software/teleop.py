@@ -33,13 +33,13 @@ class TeleopController:
         self.active = False
         print("[TELEOP] Teleop control stopped")
 
-    def run_step(self, cmd):
+    def run_step(self, subsystem_motor, cmd):
         """Read joystick state and convert to control commands."""
         if not self.active:
             return
         
         x = cmd[0]
-        robot.motor_subsystem.set_power(x)
+        subsystem_motor.set_power(x)
 
         telem = random.sample(range(1, 101), 6)
         
