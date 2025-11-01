@@ -1,4 +1,4 @@
-from util import Util
+from library.util import Util
 
 
 class Motor:
@@ -12,9 +12,8 @@ class Motor:
 
     def calculate_power(self, power):
 
-        #power = Util.clip(power, -1.0, 1.0)
-        power = max(-1,min(1,power))
-        
+        power = Util.clip(power, -1.0, 1.0)
+
         if power >= 0:
             pulse = self.neutral_pulse + (self.full_forward_pulse - self.neutral_pulse) * power
         else:
