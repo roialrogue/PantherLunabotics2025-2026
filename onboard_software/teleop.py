@@ -1,6 +1,5 @@
 import time
 import random
-import robot
 
 '''
 Axis 0 - Left Stick (L = -1, R = 1)
