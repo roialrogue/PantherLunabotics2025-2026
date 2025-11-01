@@ -59,24 +59,24 @@ class Supervisor:
         while True:
             pygame.event.pump() # Update joystick state
 
-            teleop_switch = self.joystick.get_button(0)
-            auto_switch = self.joystick.get_button(1)
+            # teleop_switch = self.joystick.get_button(0)
+            # auto_switch = self.joystick.get_button(1)
 
-            if teleop_switch & (self.mode != "TELEOP"):
-                self.server.command_queue.put("SWITCH TO TELEOP")
-                self.mode = "TELEOP"
-            elif auto_switch & (self.mode != "AUTO"):
-                self.server.command_queue.put("SWITCH TO AUTONOMOUS")
-                self.mode = "AUTO"
+            # if teleop_switch & (self.mode != "TELEOP"):
+            #     self.server.command_queue.put("SWITCH TO TELEOP")
+            #     self.mode = "TELEOP"
+            # elif auto_switch & (self.mode != "AUTO"):
+            #     self.server.command_queue.put("SWITCH TO AUTONOMOUS")
+            #     self.mode = "AUTO"
 
             #I would do it this way but up to you it would replace (62-70)
-            # if event.type == pygame.JOYBUTTONDOWN and self.joystick.get_button(6):
-            #     if self.mode != "TELEOP":
-            #         self.server.command_queue.put("SWITCH TO TELEOP")
-            #         self.mode = "TELEOP"
-            #     else:
-            #         self.server.command_queue.put("SWITCH TO AUTONOMOUS")
-            #         self.mode = "AUTO"
+            if event.type == pygame.JOYBUTTONDOWN and self.joystick.get_button(6):
+                if self.mode != "TELEOP":
+                    self.server.command_queue.put("SWITCH TO TELEOP")
+                    self.mode = "TELEOP"
+                else:
+                    self.server.command_queue.put("SWITCH TO AUTONOMOUS")
+                    self.mode = "AUTO"
 
             if self.mode == "TELEOP":
                 x = self.joystick.get_axis(0)        # forward and reverse (Left Stick up and down)

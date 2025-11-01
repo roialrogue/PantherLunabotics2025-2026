@@ -2,8 +2,9 @@ import time
 import random
 
 class AutonomousController:
-    def __init__(self):
+    def __init__(self, motor):
         self.active = False
+        self.motor = motor
 
     def start(self):
         self.active = True

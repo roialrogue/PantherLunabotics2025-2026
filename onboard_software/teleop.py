@@ -1,6 +1,5 @@
 import time
 import random
-import robot
 
 '''
 Axis 0 - Left Stick (L = -1, R = 1)
@@ -22,8 +21,9 @@ Button 7 - Start
 '''
 
 class TeleopController:
-    def __init__(self):
+    def __init__(self, motor):
         self.active = False
+        self.subsystem_motor = motor
 
     def start(self):
         self.active = True
@@ -33,13 +33,13 @@ class TeleopController:
         self.active = False
         print("[TELEOP] Teleop control stopped")
 
-    def run_step(self, subsystem_motor, cmd):
+    def run_step(self, cmd):
         """Read joystick state and convert to control commands."""
         if not self.active:
             return
         
         x = cmd[0]
-        subsystem_motor.set_power(x)
+        self.subsystem_motor.set_power(x)
 
         telem = random.sample(range(1, 101), 6)
         
