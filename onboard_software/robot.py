@@ -1,9 +1,9 @@
-from autonomous import AutonomousController
-from teleop import TeleopController
-from client import Client
+from onboard_software.autonomous import AutonomousController
+from onboard_software.teleop import TeleopController
+from onboard_software.client import Client
 import queue
 import RPi.GPIO as GPIO
-from subsystems.motor_example import MotorExample
+from onboard_software.subsystems.motor_example import MotorExample
 
 
 
