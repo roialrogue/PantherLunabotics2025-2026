@@ -9,10 +9,10 @@ from onboard_software.subsystems.motor_example import MotorExample
 
 class Robot:
     def __init__(self):
+        GPIO.setmode(GPIO.BOARD)
         self.subsystem_motor = MotorExample()
         self.auto_ctrl = AutonomousController(self.subsystem_motor)
         self.teleop_ctrl = TeleopController(self.subsystem_motor)
-        GPIO.setmode(GPIO.BOARD)
 
         self.client = Client()
         self.client.start()
