@@ -1,8 +1,6 @@
 import time
 import random
 
-from onboard_software.robot import RobotCore
-
 '''
 Axis 0 - Left Stick (L = -1, R = 1)
 Axis 1 - Left Stick (T = -1, D = 1)
