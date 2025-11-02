@@ -11,7 +11,7 @@ class PIDController:
         kp: float = 0.0
         ki: float = 0.0
         kd: float = 0.0
-        Kf: float = 0.0
+        kf: float = 0.0
         iZone: float = 0.0
 
         def __post_init__(self):
