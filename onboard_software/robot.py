@@ -4,15 +4,12 @@ from onboard_software.client import Client
 import queue
 import RPi.GPIO as GPIO
 from onboard_software.subsystems.motor_example import MotorExample
-
-
-
+        
 class Robot:
     def __init__(self):
-        GPIO.setmode(GPIO.BOARD)
-        self.subsystem_motor = MotorExample()
-        self.auto_ctrl = AutonomousController(self.subsystem_motor)
-        self.teleop_ctrl = TeleopController(self.subsystem_motor)
+        self.robot = RobotCore()
+        self.auto_ctrl = AutonomousController(self.robot)
+        self.teleop_ctrl = TeleopController(self.robot)
 
         self.client = Client()
         self.client.start()
@@ -62,6 +59,18 @@ class Robot:
             print("\n[CLIENT] Interrupted by user.")
         finally:
             self.client.close()
+            self.robot.stop()
+
+class RobotCore:
+    def __init__(self):
+        # Contains all subsystems and initializes GPIO
+        GPIO.setmode(GPIO.BOARD)
+        self.subsystem_motor = MotorExample()
+
+    def stop(self):
+        GPIO.cleanup()
+        self.subsystem_motor.stop()
+        
 
 if __name__ == "__main__":
     Robot().run()

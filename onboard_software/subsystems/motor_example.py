@@ -68,6 +68,5 @@ class MotorExample:
     def get_real_world_position(self):
         return self.get_current_position() + self.zero_position_offset
 
-    def cleanup_motor(self):
+    def stop(self):
         self.pwm.stop()
-        GPIO.cleanup()
