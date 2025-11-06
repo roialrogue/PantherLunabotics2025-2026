@@ -27,38 +27,38 @@ class Client:
                 # print(f"[SERVER] Sent: {message}")
 
 
-    def _receiver_thread(self):
-        stream = self.client.makefile('r')  # create once
-        while True:
-            raw = stream.readline()
-            if not raw:
-                # EOF or disconnect
-                print("[CLIENT] Connection closed by server.")
-                break
-
-            raw = raw.strip()
-            if not raw:
-                continue
-
-            msg = json.loads(raw)
-            self.telemetry_queue.put(msg)
-            print("[CLIENT] Message from server:", msg)
-
-
     # def _receiver_thread(self):
-    #     print(f"[SERVER] Connected receiver thread to {self.addr[1]}")
-
+    #     stream = self.client.makefile('r')  # create once
     #     while True:
-    #         with self.client.makefile('r') as stream:
-    #              for raw in stream:
-    #                 raw = raw.strip()
-    #                 if not raw:
-    #                     continue
-    #                 msg= json.loads(raw)
-    #                 self.telemetry_queue.put(msg)
-    #                 print(f"[SERVER] Received: {self.telemetry_queue.get()}")
+    #         raw = stream.readline()
+    #         if not raw:
+    #             # EOF or disconnect
+    #             print("[CLIENT] Connection closed by server.")
+    #             break
 
-    #         data = self.client.recv(1024)  # blocking is fine here
-    #         if data:
-    #             self.telemetry_queue.put(data.decode())
+    #         raw = raw.strip()
+    #         if not raw:
+    #             continue
+
+    #         msg = json.loads(raw)
+    #         self.telemetry_queue.put(msg)
+    #         print("[CLIENT] Message from server:", msg)
+
+
+    def _receiver_thread(self):
+        #print(f"[SERVER] Connected receiver thread to {self.addr[1]}")
+
+        while True:
+            with self.client.makefile('r') as stream:
+                 for raw in stream:
+                    raw = raw.strip()
+                    if not raw:
+                        continue
+                    msg= json.loads(raw)
+                    self.telemetry_queue.put(msg)
+                    print(f"[SERVER] Received: {self.telemetry_queue.get()}")
+
+            data = self.client.recv(1024)  # blocking is fine here
+            if data:
+                self.telemetry_queue.put(data.decode())
                 
