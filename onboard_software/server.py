@@ -40,7 +40,7 @@ class Server:
             raw = stream.readline()
             if not raw:
                 # EOF or disconnect
-                print("[CLIENT] Connection closed by server.")
+                print("[SERVER] Connection closed by server.")
                 break
 
             raw = raw.strip()
@@ -49,4 +49,4 @@ class Server:
 
             msg = json.loads(raw)
             self.cmd_input_queue.put(msg)
-            print("[CLIENT] Message from server:", msg)
+            print("[SERVER] Message from server:", msg)

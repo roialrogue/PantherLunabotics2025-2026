@@ -45,13 +45,13 @@ class Robot:
                     data = None
 
                 self.toggle_mode(data)
+                cmd = data
+                id = cmd[0]
 
-                if self.mode == "AUTO":
-                    cmd = data
+                if self.mode == "AUTO" and id == "AUTO":
                     telem = self.auto_ctrl.run_step(cmd)
                     self.server.telem_output_queue.put(telem)
-                elif self.mode == "TELEOP":
-                    cmd = data
+                elif self.mode == "TELEOP" and id == "TELEOP":
                     telem = self.teleop_ctrl.run_step(cmd)
                     self.server.telem_output_queue.put(telem)
 

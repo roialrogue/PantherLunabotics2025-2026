@@ -37,11 +37,12 @@ class TeleopController:
         """Read joystick state and convert to control commands."""
         if not self.active:
             return
-        
+        #print(cmd)
         x = cmd[0]
+        print(x)
 
         # Method A
-        # self.robot.subsystem_motor.set_power(x)
+        #self.robot.subsystem_motor.set_power(x)
 
         telem = random.sample(range(1, 101), 6)
         
