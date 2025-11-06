@@ -46,7 +46,7 @@ class Client:
 
 
     def _receiver_thread(self):
-        print(f"[SERVER] Connected receiver thread to {self.addr[1]}")
+        #print(f"[SERVER] Connected receiver thread to {self.addr[1]}")
 
         while True:
             with self.client.makefile('r') as stream:
