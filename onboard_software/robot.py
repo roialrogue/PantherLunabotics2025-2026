@@ -58,7 +58,7 @@ class Robot:
         except KeyboardInterrupt:
             print("\n[CLIENT] Interrupted by user.")
         finally:
-            self.server.close()
+            # self.server.close()
             self.robot.stop()
 
 class RobotCore:

@@ -19,7 +19,7 @@ class Client:
         receiver.start()
 
     def _sender_thread(self):
-        print(f"[SERVER] Connected sender thread to {self.addr[1]}")
+        # print(f"[SERVER] Connected sender thread to {self.addr[1]}")
 
         while True:
                 message = self.command_queue.get()
