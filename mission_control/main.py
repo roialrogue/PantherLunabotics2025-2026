@@ -63,10 +63,10 @@ class Supervisor:
             auto_switch = self.joystick.get_button(1)
 
             if teleop_switch & (self.mode != "TELEOP"):
-                self.server.command_queue.put("SWITCH TO TELEOP")
+                self.client.command_queue.put("SWITCH TO TELEOP")
                 self.mode = "TELEOP"
             elif auto_switch & (self.mode != "AUTO"):
-                self.server.command_queue.put("SWITCH TO AUTONOMOUS")
+                self.client.command_queue.put("SWITCH TO AUTONOMOUS")
                 self.mode = "AUTO"
 
             #I would do it this way but up to you it would replace (62-70)
