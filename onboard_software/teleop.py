@@ -41,7 +41,7 @@ class TeleopController:
         x = cmd[0]
 
         # Method A
-        self.robot.subsystem_motor.set_power(x)
+        # self.robot.subsystem_motor.set_power(x)
 
         telem = random.sample(range(1, 101), 6)
         
