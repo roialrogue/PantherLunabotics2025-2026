@@ -31,6 +31,7 @@ class MotorExample:
         current_position = self.get_current_position()
         pidOutput = self.controller.calculate(current_position, self.target_position)
         power = self.gravity_compensation_power + pidOutput # For a straight linear system
+        print(power)
         duty_cycle = self.motor.calculate_power(power)
         self.pwm.start(duty_cycle)
         print(f"Target: {self.target_position:.2f} | Current: {current_position:.2f} | Power: {power:.2f}")
