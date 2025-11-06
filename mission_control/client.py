@@ -19,34 +19,12 @@ class Client:
         receiver.start()
 
     def _sender_thread(self):
-        # print(f"[SERVER] Connected sender thread to {self.addr[1]}")
 
         while True:
                 message = self.command_queue.get()
                 self.client.sendall((json.dumps(message)+"\n").encode())
-                # print(f"[SERVER] Sent: {message}")
-
-
-    # def _receiver_thread(self):
-    #     stream = self.client.makefile('r')  # create once
-    #     while True:
-    #         raw = stream.readline()
-    #         if not raw:
-    #             # EOF or disconnect
-    #             print("[CLIENT] Connection closed by server.")
-    #             break
-
-    #         raw = raw.strip()
-    #         if not raw:
-    #             continue
-
-    #         msg = json.loads(raw)
-    #         self.telemetry_queue.put(msg)
-    #         print("[CLIENT] Message from server:", msg)
-
 
     def _receiver_thread(self):
-        #print(f"[SERVER] Connected receiver thread to {self.addr[1]}")
 
         while True:
             with self.client.makefile('r') as stream:
@@ -56,7 +34,7 @@ class Client:
                         continue
                     msg= json.loads(raw)
                     self.telemetry_queue.put(msg)
-                    print(f"[SERVER] Received: {self.telemetry_queue.get()}")
+                    print(f"[CLIENT] Received: {self.telemetry_queue.get()}")
 
             data = self.client.recv(1024)  # blocking is fine here
             if data:
