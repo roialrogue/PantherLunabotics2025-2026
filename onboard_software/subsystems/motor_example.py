@@ -20,10 +20,10 @@ class MotorExample:
         # If circle Ticks_Per_Degree = ENCODER_CPR * GEAR_RATIO / 360.0
 
         # Initialize GPIO pin and PID controller
+        self.motor = Motor.Motor()
         GPIO.setup(self.pin, GPIO.OUT, initial=GPIO.LOW)
         self.pwm = GPIO.PWM(self.pin, self.motor.get_frequency())
         self.controller = Controller.PIDController(self.pid_coefficients)
-        self.motor = Motor.Motor()
 
     # This method is called periodically so that the PID controller can move the subsystem towards its target
     def motor_task(self):
@@ -68,6 +68,5 @@ class MotorExample:
     def get_real_world_position(self):
         return self.get_current_position() + self.zero_position_offset
 
-    def cleanup_motor(self):
+    def stop(self):
         self.pwm.stop()
-        GPIO.cleanup()

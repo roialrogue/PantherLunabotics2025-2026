@@ -21,9 +21,9 @@ Button 7 - Start
 '''
 
 class TeleopController:
-    def __init__(self, motor):
+    def __init__(self, robot):
         self.active = False
-        self.subsystem_motor = motor
+        self.robot = robot
 
     def start(self):
         self.active = True
@@ -39,7 +39,9 @@ class TeleopController:
             return
         
         x = cmd[0]
-        self.subsystem_motor.set_power(x)
+
+        # Method A
+        self.robot.subsystem_motor.set_power(x)
 
         telem = random.sample(range(1, 101), 6)
         
