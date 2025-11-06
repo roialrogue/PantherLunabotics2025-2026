@@ -7,7 +7,7 @@ class Client:
     def __init__(self):
         self.client = socket.socket()
         port = 6767
-        self.client.connect(('10.154.11.10',port))
+        self.client.connect(('',port))
         self.cmd_input_queue = queue.Queue()
         self.telem_output_queue = queue.Queue()
 
