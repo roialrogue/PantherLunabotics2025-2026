@@ -1,6 +1,6 @@
 import time
 import pygame
-from server import Server
+from mission_control.client import Client
 
 '''
 Axis 0 - Left Stick (L = -1, R = 1)
@@ -22,9 +22,9 @@ Button 7 - Start
 '''
 
 class Supervisor:
-    def __init__(self):
+    def __init__(self, server_ip):
         self.mode = None
-        self.server = Server() # start the TCP server
+        self.client = Client(server_ip) # start the TCP server
 
         # initialise the controller listener
         pygame.init()
@@ -50,11 +50,11 @@ class Supervisor:
                     if self.joystick.get_button(0):
                         print("[SUPERVISOR] Starting in TELEOP mode")
                         self.mode = "TELEOP"
-                        self.server.command_queue.put("TELEOP START")
+                        self.client.command_queue.put("TELEOP START")
                     elif self.joystick.get_button(1):
                         print("[SUPERVISOR] Starting in AUTO mode")
                         self.mode = "AUTO"
-                        self.server.command_queue.put("AUTONOMOUS START")
+                        self.client.command_queue.put("AUTONOMOUS START")
 
         while True:
             pygame.event.pump() # Update joystick state
@@ -72,10 +72,10 @@ class Supervisor:
             #I would do it this way but up to you it would replace (62-70)
             if event.type == pygame.JOYBUTTONDOWN and self.joystick.get_button(6):
                 if self.mode != "TELEOP":
-                    self.server.command_queue.put("SWITCH TO TELEOP")
+                    self.client.command_queue.put("SWITCH TO TELEOP")
                     self.mode = "TELEOP"
                 else:
-                    self.server.command_queue.put("SWITCH TO AUTONOMOUS")
+                    self.client.command_queue.put("SWITCH TO AUTONOMOUS")
                     self.mode = "AUTO"
 
             if self.mode == "TELEOP":
@@ -92,11 +92,12 @@ class Supervisor:
                     stop_dumping_motor = self.joystick.get_axis(5)   # stop mining belt motor (RT)
 
                 self.commands = [x, y, yaw_rate, start_mining_motor, stop_mining_motor, start_dumping_motor, stop_dumping_motor]
-                self.server.command_queue.put(self.commands)
+                self.client.command_queue.put(self.commands)
                 time.sleep(0.1)
             
             # print(f"[TELEOP] Joystick axes: x={x:.2f}, y={y:.2f}")
             # time.sleep(0.1)
 
 if __name__ == "__main__":
-    Supervisor().run()
+    ROBOT_VPN_IP = "10.154.11.99"
+    Supervisor().run(ROBOT_VPN_IP)

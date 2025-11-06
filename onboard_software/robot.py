@@ -1,6 +1,6 @@
 from onboard_software.autonomous import AutonomousController
 from onboard_software.teleop import TeleopController
-from onboard_software.client import Client
+from onboard_software.server import Server
 import queue
 import RPi.GPIO as GPIO
 from onboard_software.subsystems.motor_example import MotorExample
@@ -11,10 +11,10 @@ class Robot:
         self.auto_ctrl = AutonomousController(self.robot)
         self.teleop_ctrl = TeleopController(self.robot)
 
-        self.client = Client()
-        self.client.start()
+        self.server = Server()
+        self.server.start()
 
-        data = self.client.cmd_input_queue.get()
+        data = self.server.cmd_input_queue.get()
         if data == "TELEOP START":
             self.teleop_ctrl.start()
             self.mode = "TELEOP"
@@ -40,7 +40,7 @@ class Robot:
         try:
             while True:
                 try:
-                    data = self.client.cmd_input_queue.get_nowait()
+                    data = self.server.cmd_input_queue.get_nowait()
                 except queue.Empty:
                     data = None
 
@@ -49,16 +49,16 @@ class Robot:
                 if self.mode == "AUTO":
                     cmd = data
                     telem = self.auto_ctrl.run_step(cmd)
-                    self.client.telem_output_queue.put(telem)
+                    self.server.telem_output_queue.put(telem)
                 elif self.mode == "TELEOP":
                     cmd = data
                     telem = self.teleop_ctrl.run_step(cmd)
-                    self.client.telem_output_queue.put(telem)
+                    self.server.telem_output_queue.put(telem)
 
         except KeyboardInterrupt:
             print("\n[CLIENT] Interrupted by user.")
         finally:
-            self.client.close()
+            self.server.close()
             self.robot.stop()
 
 class RobotCore:
