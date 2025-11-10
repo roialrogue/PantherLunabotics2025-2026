@@ -21,6 +21,6 @@ class AutonomousController:
         print("[AUTO] Running autonomous step...")
     
 
-        time.sleep(0.5)  # Simulate processing
+        time.sleep(0.01)  # Simulate processing
         telem = random.sample(range(1, 101), 2)
         return telem

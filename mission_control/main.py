@@ -50,47 +50,48 @@ class Supervisor:
                     if self.joystick.get_button(0):
                         print("[SUPERVISOR] Starting in TELEOP mode")
                         self.mode = "TELEOP"
-                        self.client.command_queue.put("TELEOP START")
+                        self.client.command_queue.put(["TELEOP START"])
                     elif self.joystick.get_button(1):
                         print("[SUPERVISOR] Starting in AUTO mode")
                         self.mode = "AUTO"
-                        self.client.command_queue.put("AUTONOMOUS START")
+                        self.client.command_queue.put(["AUTONOMOUS START"])
 
         while True:
-            pygame.event.pump() # Update joystick state
+            pygame.event.get() # Update joystick state
 
             if event.type == pygame.JOYBUTTONDOWN and self.joystick.get_button(6):
+                time.sleep(2)
                 if self.mode != "TELEOP":
-                    self.client.command_queue.put("SWITCH TO TELEOP")
+                    self.client.command_queue.put(["SWITCH TO TELEOP"])
                     self.mode = "TELEOP"
-                else:
-                    self.client.command_queue.put("SWITCH TO AUTONOMOUS")
+                elif self.mode != "AUTO":
+                    self.client.command_queue.put(["SWITCH TO AUTONOMOUS"])
                     self.mode = "AUTO"
 
             if self.mode == "TELEOP":
                 x = self.joystick.get_axis(0)        # forward and reverse (Left Stick up and down)
                 y = self.joystick.get_axis(1)        # strafe left and right (Left Stick left and right)
                 yaw_rate = self.joystick.get_axis(2) # yaw angle rate (Right Stick left and right)
+                self.commands = [self.mode, x, y, yaw_rate]
+
                 if event.type == pygame.JOYBUTTONDOWN:
                     start_mining_motor = self.joystick.get_button(4) # start mining belt motor (LB)
                     stop_mining_motor = self.joystick.get_button(5)  # stop mining belt motor (RB)
                     start_dumping_motor = self.joystick.get_axis(4)  # start mining belt motor (LT)
                     stop_dumping_motor = self.joystick.get_axis(5)   # stop mining belt motor (RT)
+                    self.commands.extend([start_mining_motor, stop_mining_motor, start_dumping_motor, stop_dumping_motor])
 
-                self.commands = [self.mode, x, y, yaw_rate, start_mining_motor, stop_mining_motor, start_dumping_motor, stop_dumping_motor]
-                self.client.command_queue.put(self.commands)
-                time.sleep(0.1)
-
-            if self.mode == "AUTO":
+            elif self.mode == "AUTO":
+                self.commands = [self.mode]
                 if event.type == pygame.JOYBUTTONDOWN:
                     start_mining_auto = self.joystick.get_button(0)
                     start_deposit_auto = self.joystick.get_button(1) 
                     start_full_auto = self.joystick.get_button(2)
                     start_pathing_auto = self.joystick.get_button(3)
+                    self.commands.extend([start_mining_auto, start_deposit_auto, start_full_auto, start_pathing_auto])
 
-                self.commands = [self.mode, start_mining_auto, start_deposit_auto, start_full_auto, start_pathing_auto]
-                self.client.command_queue.put(self.commands)
-                time.sleep(0.1)
+            self.client.command_queue.put(self.commands)
+            time.sleep(0.01)
             
             # print(f"[TELEOP] Joystick axes: x={x:.2f}, y={y:.2f}")
             # time.sleep(0.1)

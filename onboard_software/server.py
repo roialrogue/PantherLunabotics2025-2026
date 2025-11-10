@@ -2,6 +2,7 @@ import socket
 import queue
 import json
 import threading
+import time
 
 class Server:
     def __init__(self):
@@ -33,6 +34,7 @@ class Server:
         while True:
             message = self.telem_output_queue.get()
             self.client.sendall((json.dumps(message)+"\n").encode())
+            time.sleep(0.01) # run at 100Hz
 
     def _receiver_thread(self):
         stream = self.client.makefile('r')  # create once
@@ -50,3 +52,4 @@ class Server:
             msg = json.loads(raw)
             self.cmd_input_queue.put(msg)
             print("[SERVER] Message from server:", msg)
+            time.sleep(0.01) # run at 100Hz
