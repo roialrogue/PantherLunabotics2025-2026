@@ -1,15 +1,8 @@
-from onboard_software.autonomous import AutonomousController
-from onboard_software.teleop import TeleopController
 from onboard_software.server import Server
 import queue
-import RPi.GPIO as GPIO
-from onboard_software.subsystems.motor_example import MotorExample
         
 class Robot:
     def __init__(self):
-        self.robot = RobotCore()
-        self.auto_ctrl = AutonomousController(self.robot)
-        self.teleop_ctrl = TeleopController(self.robot)
 
         self.server = Server()
         self.server.start()
@@ -48,29 +41,10 @@ class Robot:
                 cmd = data
                 id = cmd[0]
 
-                if self.mode == "AUTO" and id == "AUTO":
-                    telem = self.auto_ctrl.run_step(cmd)
-                    self.server.telem_output_queue.put(telem)
-                elif self.mode == "TELEOP" and id == "TELEOP":
-                    telem = self.teleop_ctrl.run_step(cmd)
-                    self.server.telem_output_queue.put(telem)
-
         except KeyboardInterrupt:
             print("\n[CLIENT] Interrupted by user.")
         finally:
-            # self.server.close()
-            self.robot.stop()
-
-class RobotCore:
-    def __init__(self):
-        # Contains all subsystems and initializes GPIO
-        GPIO.setmode(GPIO.BOARD)
-        self.subsystem_motor = MotorExample()
-
-    def stop(self):
-        GPIO.cleanup()
-        self.subsystem_motor.stop()
-        
-
+            print("[CLIENT] Shutting down.")
+            
 if __name__ == "__main__":
     Robot().run()
