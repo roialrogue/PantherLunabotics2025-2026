@@ -12,13 +12,19 @@ class Client:
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.input_queue = queue.Queue() # For incoming telemetry and ACKs
         self.output_queue = queue.Queue() # For outgoing commands and ACKs
+        self.telemetry_queue = queue.Queue() # Queue for incoming telemetry
         self.running = True
         self.message_id = 0
         self.pending_acks = {}
         self.ack_timeout = 1 # seconds
 
     def connect(self):
-        self.client_socket.connect((self.host, self.port))
+        try:
+            self.client_socket.connect((self.host, self.port))
+        except ConnectionRefusedError:
+            print(f"Server has to be started first!")
+            return
+
         print("[Client (Laptop)] Connected to server at : " + self.host)
 
         threading.Thread(target=self._sender_thread).start()
@@ -28,10 +34,9 @@ class Client:
         # Process incoming telemetry and ACKs
         while self.running:
             try:
-                msg = self.input_queue.get(timeout=5)  # Wait up to 5 second for a message
+                msg = self.input_queue.get(timeout=1)  # Wait up to 1 second for a message
                 if msg.get('type') == 'telemetry':
-                    #self.controller.handle_telemetry(msg)  # TODO: Process telemetry
-                    print(f"[Client (Laptop)] Telemetry received: {msg}")
+                    self.telemetry_queue.put(msg)  # TODO: Process telemetry
                     # Send ACK for telemetry
                     ack = {"type": "ack", "id": msg.get('id')}
                     self.output_queue.put(ack)
@@ -40,9 +45,17 @@ class Client:
                     msg_id = msg.get('id')
                     if msg_id in self.pending_acks: 
                         del self.pending_acks[msg_id]
-                        print(f"[Client (Laptop)] ACK received for message ID {msg_id}")
             except queue.Empty:
                 continue
+    
+    def get_telemetry(self):
+        try:
+            msg = self.telemetry_queue.get_nowait()  # Get the full message
+            print(f"[Client (Laptop)] Sending telemetry: {msg}")
+            return msg.get('data')  # Return only the 'data' part
+        except queue.Empty:
+            print("[Client (Laptop)] No telemetry available.")
+            return None  # No telemetry available
 
 
     def _receiver_thread(self):
@@ -52,7 +65,7 @@ class Client:
                 raw = stream.readline()  # Read a line from the stream
                 if not raw:  # If no data is read (connection closed)
                     print("[Client (Laptop)] Connection closed by robot server.")
-                    self.running = False
+                    self.stop()
                     break
                 raw = raw.strip()  # Remove leading/trailing whitespace
                 if not raw:  # If the stripped string is empty
@@ -99,5 +112,6 @@ class Client:
 
     def stop(self):
         self.running = False
+        self.client_socket.shutdown(socket.SHUT_WR)
         self.client_socket.close()
                 

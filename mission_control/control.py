@@ -1,3 +1,5 @@
+import sys
+import threading
 import time
 import pygame
 import client as client
@@ -25,7 +27,7 @@ class Control:
     def __init__(self, server_ip):
         self.running = True
         self.mode = None
-        #self.client = client.Client(server_ip) # start the TCP server
+        self.client = client.Client(server_ip) # start the TCP server
 
         # initialise the controller listener
         pygame.init()
@@ -33,17 +35,24 @@ class Control:
 
         if pygame.joystick.get_count() == 0:
             print("❌ No joystick detected.")
-            return
+            self.stop()
+            sys.exit(1)
 
         self.joystick = pygame.joystick.Joystick(0)
         self.joystick.init()
         print("🎮 Listening for controller action...")
 
+    def print_telemetry(self):
+        telemetry = self.client.get_telemetry()
+        if telemetry is not None:
+            print(f"[Control] Telemetry: {telemetry}")
+
     def run(self):
-        #self.client.connect()
+        threading.Thread(target=self.client.connect, daemon=True).start()
 
         print("[Control] Waiting for mode selection: \n Press A for TELEOP \n Press B for AUTO")
         while self.mode == None:
+            pygame.event.pump()
             for event in pygame.event.get():
                 if event.type == pygame.JOYBUTTONDOWN:
                     button = event.button
@@ -53,11 +62,16 @@ class Control:
                     elif button == 1:
                         print("[Control] Starting in AUTO mode")
                         self.mode = "AUTO"
+                    elif button == 7:
+                        print("[Control] Stopping robot!")
+                        self.stop()
+                        return
+            time.sleep(0.05) # 20 Hz loop
 
         # Prevent A/B release events from leaking into control loop
         while self.joystick.get_button(0) or self.joystick.get_button(1):
             pygame.event.pump()
-            time.sleep(0.05)
+            time.sleep(0.05) # 20 Hz loop
         pygame.event.clear()
         
         button_map = {
@@ -88,7 +102,8 @@ class Control:
                     if event.button == 7:
                         print("[Control] Stopping robot!")
                         self.stop()
-
+                        return
+                    
                     # Toggle
                     if event.button == 6:
                         self.mode = "TELEOP" if self.mode != "TELEOP" else "AUTO"
@@ -98,26 +113,28 @@ class Control:
                         if event.button == btn:
                             # Button just pressed
                             buttonCommand = (self.mode, f"{name}_PRESSED")
-                            #self.client.send_command(buttonCommand)
-                            print(buttonCommand)
+                            self.client.send_command(buttonCommand)
+                            #print(buttonCommand)
 
                 elif event.type == pygame.JOYBUTTONUP:
                     for name, btn in button_map.items():
                         if event.button == btn:
                             # Button just released
                             buttonCommand = (self.mode, f"{name}_RELEASED")
-                            #self.client.send_command(buttonCommand)
-                            print(buttonCommand)
+                            self.client.send_command(buttonCommand)
+                            #print(buttonCommand)
 
             commands = (self.mode, x, y, yaw_rate, pitch_rate, lt, rt)
             if commands != last_command:
-                #self.client.send_command(commands)
+                self.client.send_command(commands)
                 last_command = commands
-                print(f"[Control] Sent command: {commands}")
-            time.sleep(0.05)  # 20 Hz update rate
+                #print(commands)
+            #self.print_telemetry()
+            time.sleep(0.05) # 20 Hz loop
 
     def stop(self):
         self.running = False
+        pygame.quit()
         self.client.stop()
 
 if __name__ == "__main__":

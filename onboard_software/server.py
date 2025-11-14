@@ -19,6 +19,7 @@ class Server:
         self.client_socket = None
         self.input_queue = queue.Queue() # For incoming commands and ACKs
         self.output_queue = queue.Queue() # For outgoing telemetry and ACKs
+        self.cmd_queue = queue.Queue() # Queue for incoming commands
         self.running = True
         self.pending_acks = {}
         self.ack_timeout = 1 # seconds
@@ -36,10 +37,9 @@ class Server:
         # Process incoming commands and acks
         while self.running:
             try:
-                msg = self.input_queue.get(timeout=5)  # Wait up to 5 seconds for a message
+                msg = self.input_queue.get(timeout=1)  # Wait up to 1 second for a message
                 if msg.get('type') == 'command':
-                    #self.robot.cmd_queue.put(msg)  # TODO: Send command to the robot
-                    print(f"[Robot (Server)] Command received: {msg}")
+                    self.cmd_queue.put(msg)
                     # Send ACK for received command
                     ack = {"type": "ack", "id": msg.get('id')}
                     self.output_queue.put(ack)
@@ -48,9 +48,16 @@ class Server:
                     msg_id = msg.get('id')
                     if msg_id in self.pending_acks:
                         del self.pending_acks[msg_id]
-                        print(f"[Robot (Server)] ACK received for message ID {msg_id}")
             except queue.Empty:
                 continue
+
+    def get_command(self):
+        try:
+            msg = self.cmd_queue.get_nowait()  # Get the full message
+            print(f"[Robot (Server)] Sending command: {msg}")
+            return msg.get('data')  # Return only the 'data' part
+        except queue.Empty:
+            return None  # No command available
 
     # Receives incoming commands and ACKs from the client
     def _receiver_thread(self):
@@ -60,7 +67,7 @@ class Server:
                 raw = stream.readline() # Read a line from the stream
                 if not raw: # If no data is read (connection closed)
                     print("[Robot (Server)] Connection closed by controller.")
-                    self.running = False
+                    self.stop()
                     break
                 raw = raw.strip()
                 if not raw: # Skip if blank
@@ -111,3 +118,11 @@ class Server:
         if self.client_socket:
             self.client_socket.close()
         self.server_socket.close()
+
+if __name__ == "__main__":
+    server = Server()
+    try:
+        server.start()
+    except KeyboardInterrupt:
+        print("Shutting down server...")
+        server.stop()
