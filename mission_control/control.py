@@ -125,7 +125,7 @@ class Control:
                             #print(buttonCommand)
 
             commands = (self.mode, x, y, yaw_rate, pitch_rate, lt, rt)
-            if commands != last_command:
+            if commands != last_command and self.mode == "TELEOP":
                 self.client.send_command(commands)
                 last_command = commands
                 #print(commands)
@@ -138,5 +138,5 @@ class Control:
         self.client.stop()
 
 if __name__ == "__main__":
-    server_ip = "localhost"  # Replace with the robot server's IP address
+    server_ip = "100.67.49.108"  # Replace with the robot server's IP address
     Control(server_ip).run()
