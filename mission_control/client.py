@@ -36,7 +36,7 @@ class Client:
             try:
                 msg = self.input_queue.get(timeout=1)  # Wait up to 1 second for a message
                 if msg.get('type') == 'telemetry':
-                    self.telemetry_queue.put(msg)  # TODO: Process telemetry
+                    self.telemetry_queue.put(msg)
                     # Send ACK for telemetry
                     ack = {"type": "ack", "id": msg.get('id')}
                     self.output_queue.put(ack)
@@ -55,7 +55,7 @@ class Client:
             return msg.get('data')  # Return only the 'data' part
         except queue.Empty:
             print("[Client (Laptop)] No telemetry available.")
-            return None  # No telemetry available
+            return None
 
 
     def _receiver_thread(self):
@@ -111,7 +111,8 @@ class Client:
             time.sleep(0.2)  # Check every 0.2 seconds
 
     def stop(self):
+        print("Shutting down robot client")
         self.running = False
-        self.client_socket.shutdown(socket.SHUT_WR)
+        self.client_socket.shutdown(socket.SHUT_RDWR)
         self.client_socket.close()
                 
