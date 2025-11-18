@@ -35,7 +35,6 @@ class Control:
 
         if pygame.joystick.get_count() == 0:
             print("❌ No joystick detected.")
-            self.stop()
             sys.exit(1)
 
         self.joystick = pygame.joystick.Joystick(0)
@@ -48,7 +47,10 @@ class Control:
             print(f"[Control] Telemetry: {telemetry}")
 
     def run(self):
-        threading.Thread(target=self.client.connect, daemon=True).start()
+        self.client_t =  threading.Thread(target=self.client.connect)
+        self.client_t.start()
+        time.sleep(2.5)  # Give some time for the client to connect
+        if not self.client_t.is_alive(): return
 
         print("[Control] Waiting for mode selection: \n Press A for TELEOP \n Press B for AUTO")
         while self.mode == None:
@@ -64,6 +66,7 @@ class Control:
                         self.mode = "AUTO"
                     elif button == 7:
                         print("[Control] Stopping robot!")
+                        self.client.send_command("SHUTDOWN")
                         self.stop()
                         return
             time.sleep(0.05) # 20 Hz loop
@@ -101,6 +104,7 @@ class Control:
 
                     if event.button == 7:
                         print("[Control] Stopping robot!")
+                        self.client.send_command("SHUTDOWN")
                         self.stop()
                         return
                     
@@ -129,7 +133,7 @@ class Control:
                 self.client.send_command(commands)
                 last_command = commands
                 #print(commands)
-            #self.print_telemetry()
+            self.print_telemetry()
             time.sleep(0.05) # 20 Hz loop
 
     def stop(self):
