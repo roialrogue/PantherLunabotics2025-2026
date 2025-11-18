@@ -54,7 +54,7 @@ class Server:
     def get_command(self):
         try:
             msg = self.cmd_queue.get_nowait()  # Get the full message
-            print(f"[Robot (Server)] Sending command: {msg}")
+            print(f"[Robot (Server)] Sending command to robot: {msg}")
             return msg.get('data')  # Return only the 'data' part
         except queue.Empty:
             return None  # No command available
@@ -115,14 +115,29 @@ class Server:
     
     def stop(self):
         self.running = False
-        if self.client_socket:
-            self.client_socket.close()
+        try:
+            self.server_socket.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
         self.server_socket.close()
 
 if __name__ == "__main__":
     server = Server()
-    try:
-        server.start()
-    except KeyboardInterrupt:
-        print("Shutting down server...")
-        server.stop()
+    threading.Thread(target=server.start).start()
+
+    running_robot = True
+    num = 0
+
+    while running_robot:
+        cmd = server.get_command()
+
+        num += 1
+        time.sleep(0.1)
+        if num % 50 == 0:
+            pass
+            #server.send_telemetry({"status": "operational", "counter": num})
+
+        if cmd == "SHUTDOWN":
+            print("Shutting down robot server")
+            running_robot = False
+            server.stop()
