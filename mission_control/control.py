@@ -27,12 +27,12 @@ class Control:
     def __init__(self, server_ip):
         self.running = True
         self.mode = None
-        self.client = client.Client(server_ip) # start the TCP server
+        self.client = client.Client(server_ip) # Start the TCP server
 
-        # initialise the controller listener
+        # Initialize the controller
         pygame.init()
         pygame.joystick.init()
-
+        
         if pygame.joystick.get_count() == 0:
             print("❌ No joystick detected.")
             sys.exit(1)
@@ -89,7 +89,7 @@ class Control:
         last_command = None
 
         while self.running:
-            pygame.event.pump() # Update joystick state
+            pygame.event.pump() # Update joystick states
 
             # Read joystick axes
             x = self.joystick.get_axis(0)          # Left Stick up and down
@@ -108,7 +108,6 @@ class Control:
                         self.stop()
                         return
                     
-                    # Toggle
                     if event.button == 6:
                         self.mode = "TELEOP" if self.mode != "TELEOP" else "AUTO"
                         print(f"[Control] Switching to {self.mode} mode")
@@ -143,5 +142,5 @@ class Control:
         self.client.stop()
 
 if __name__ == "__main__":
-    server_ip = "localhost"  # Replace with the robot server's IP address
+    server_ip = "localhost"  # Robot IP address: 100.67.49.108
     Control(server_ip).run()
