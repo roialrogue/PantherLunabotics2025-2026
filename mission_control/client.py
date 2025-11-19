@@ -54,7 +54,6 @@ class Client:
             print(f"[Client (Laptop)] Sending telemetry: {msg}")
             return msg.get('data')  # Return only the 'data' part
         except queue.Empty:
-            print("[Client (Laptop)] No telemetry available.")
             return None
 
 
