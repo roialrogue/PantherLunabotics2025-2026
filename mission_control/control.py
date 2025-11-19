@@ -39,20 +39,21 @@ class Control:
 
         self.joystick = pygame.joystick.Joystick(0)
         self.joystick.init()
-        print("🎮 Listening for controller action...")
+        print("[Control] 🎮 Controller connected!")
 
     def print_telemetry(self):
         telemetry = self.client.get_telemetry()
         if telemetry is not None:
-            print(f"[Control] Telemetry: {telemetry}")
+            print(f"[Control] \033[35mTelemetry\033[0m: {telemetry}")
 
     def run(self):
         self.client_t =  threading.Thread(target=self.client.connect)
         self.client_t.start()
         time.sleep(2.5)  # Give some time for the client to connect
         if not self.client_t.is_alive(): return
+        self.client.send_command("READY") # Notify robot that client is ready
 
-        print("[Control] Waiting for mode selection: \n Press A for TELEOP \n Press B for AUTO")
+        print("[Control] Waiting for mode selection: \n Press A for TELEOP \n Press B for AUTO\n")
         while self.mode == None:
             pygame.event.pump()
             for event in pygame.event.get():
@@ -65,7 +66,6 @@ class Control:
                         print("[Control] Starting in AUTO mode")
                         self.mode = "AUTO"
                     elif button == 7:
-                        print("[Control] Stopping robot!")
                         self.client.send_command("SHUTDOWN")
                         self.stop()
                         return
@@ -104,7 +104,6 @@ class Control:
                 if event.type == pygame.JOYBUTTONDOWN:
 
                     if event.button == 7:
-                        print("[Control] Stopping robot!")
                         self.client.send_command("SHUTDOWN")
                         self.stop()
                         return
@@ -130,7 +129,7 @@ class Control:
                             #print(buttonCommand)
 
             commands = (self.mode, x, y, yaw_rate, pitch_rate, lt, rt)
-            if commands != last_command:
+            if commands != last_command and self.mode == "TELEOP": # For now only TELEOP uses axes
                 self.client.send_command(commands)
                 last_command = commands
                 #print(commands)
@@ -138,6 +137,7 @@ class Control:
             time.sleep(0.05) # 20 Hz loop
 
     def stop(self):
+        print("[Control] Starting shut down")
         self.running = False
         pygame.quit()
         self.client.stop()
