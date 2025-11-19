@@ -13,7 +13,7 @@ class Server:
         # SOCK_STREAM is used for TCP packets
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.bind((self.host, self.port))
-        print("Socket binded to %s:%d" % (self.host, self.port))
+        print("[Server] Socket binded to %s:%d" % (self.host, self.port))
         # Lets 1 queue connect
         self.server_socket.listen(1) # Allow only 1 connection
         self.client_socket = None
@@ -23,12 +23,12 @@ class Server:
         self.running = True
         self.pending_acks = {}
         self.ack_timeout = 1 # seconds
-        self.message_id = 0
+        self.message_id = -1
 
     def start(self):
-        print("[Robot (Server)] Waiting for client...")
+        print("[Server] Waiting for client...")
         self.client_socket, addr = self.server_socket.accept()
-        print("[Robot (Server)] Got connection from", addr)
+        print("[Server] Got connection from", addr)
 
         threading.Thread(target=self._receiver_thread).start()
         threading.Thread(target=self._sender_thread).start()
@@ -54,7 +54,7 @@ class Server:
     def get_command(self):
         try:
             msg = self.cmd_queue.get_nowait()  # Get the full message
-            print(f"[Robot (Server)] Sending command to robot: {msg}")
+            print(f"[Server] Sent to robot: {msg}")
             return msg.get('data')  # Return only the 'data' part
         except queue.Empty:
             return None  # No command available
@@ -66,7 +66,7 @@ class Server:
             while self.running:
                 raw = stream.readline() # Read a line from the stream
                 if not raw: # If no data is read (connection closed)
-                    print("[Robot (Server)] Connection closed by controller.")
+                    print("[Server] Connection closed by controller.")
                     self.stop()
                     break
                 raw = raw.strip()
@@ -74,7 +74,7 @@ class Server:
                     continue
                 msg = json.loads(raw)
                 self.input_queue.put(msg)
-                print(f"[Robot (Server)] Received: {msg}")
+                print(f"[Server] Received: {msg}")
         finally:
             stream.close()
 
@@ -82,7 +82,7 @@ class Server:
         msg = {"type": "telemetry", "id": self.message_id, "data": data}
         self.output_queue.put(msg)
         self.pending_acks[self.message_id] = (msg, time.time())
-        self.message_id += 1
+        self.message_id -= 1
 
 
     def _sender_thread(self):
@@ -94,7 +94,7 @@ class Server:
                     json_str = json.dumps(msg) + '\n'
                     stream.write(json_str)
                     stream.flush()  # Flush the stream to ensure data is sent immediately
-                    print(f"[Robot (Server)] Sent: {msg}")
+                    print(f"[Server] Sent: {msg}")
                 except queue.Empty:
                     continue
         finally:
@@ -108,7 +108,7 @@ class Server:
                 if current_time - sent_time > self.ack_timeout:
                     to_resend.append(msg)
             for msg in to_resend:
-                print(f"[Robot (Server)] Resending unacknowledged message: {msg}") 
+                print(f"[Server] Resending unacknowledged message: {msg}") 
                 self.output_queue.put(msg)
                 self.pending_acks[msg['id']] = (msg, time.time())  # Update the timestamp in pending ACKs
             time.sleep(0.2)  # Check every 0.2 seconds
@@ -120,21 +120,4 @@ class Server:
         except OSError:
             pass
         self.server_socket.close()
-
-if __name__ == "__main__":
-    server = Server()
-    threading.Thread(target=server.start).start()
-
-    running_robot = True
-    num = 0
-
-    while running_robot:
-        cmd = server.get_command()
-
-        time.sleep(0.1)
-        server.send_telemetry({"status": "operational", "counter": num})
-
-        if cmd == "SHUTDOWN":
-            print("Shutting down robot server")
-            running_robot = False
-            server.stop()
+        
