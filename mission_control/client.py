@@ -14,7 +14,7 @@ class Client:
         self.output_queue = queue.Queue() # For outgoing commands and ACKs
         self.telemetry_queue = queue.Queue() # Queue for incoming telemetry
         self.running = True
-        self.message_id = 0
+        self.message_id = 1
         self.pending_acks = {}
         self.ack_timeout = 1 # seconds
 
@@ -22,10 +22,10 @@ class Client:
         try:
             self.client_socket.connect((self.host, self.port))
         except ConnectionRefusedError:
-            print(f"Server has to be started first!")
+            print(f"[Client] Server has to be started first!")
             return
 
-        print("[Client (Laptop)] Connected to server at : " + self.host)
+        print("[Client] Connected to server at : " + self.host)
 
         threading.Thread(target=self._sender_thread).start()
         threading.Thread(target=self._receiver_thread).start()
@@ -51,7 +51,7 @@ class Client:
     def get_telemetry(self):
         try:
             msg = self.telemetry_queue.get_nowait()  # Get the full message
-            print(f"[Client (Laptop)] Sending telemetry: {msg}")
+            print(f"[Client] Sent to control: {msg}")
             return msg.get('data')  # Return only the 'data' part
         except queue.Empty:
             return None
@@ -63,7 +63,7 @@ class Client:
             while self.running:
                 raw = stream.readline()  # Read a line from the stream
                 if not raw:  # If no data is read (connection closed)
-                    print("[Client (Laptop)] Connection closed by robot server.")
+                    print("[Client] Connection closed by robot server.")
                     self.stop()
                     break
                 raw = raw.strip()  # Remove leading/trailing whitespace
@@ -71,7 +71,7 @@ class Client:
                     continue
                 msg = json.loads(raw)  # Parse the string as JSON
                 self.input_queue.put(msg)
-                print(f"[Client (Laptop)] Received: {msg}")
+                print(f"[Client] Received: {msg}")
         finally:
             stream.close()
 
@@ -90,7 +90,7 @@ class Client:
                     json_str = json.dumps(msg) + '\n'  # Convert the message to JSON string
                     stream.write(json_str)  # Write the JSON string to the stream
                     stream.flush()  # Flush the stream to ensure data is sent immediately
-                    print(f"[Client (Laptop)] Sent: {msg}")
+                    print(f"[Client] Sent: {msg}")
                 except queue.Empty:
                     continue
         finally:
@@ -104,13 +104,12 @@ class Client:
                 if current_time - sent_time > self.ack_timeout:
                     to_resend.append(msg)
             for msg in to_resend:
-                print(f"[Client (Laptop)] Resending unacknowledged message: {msg}")
+                print(f"[Client] Resending unacknowledged message: {msg}")
                 self.output_queue.put(msg)
                 self.pending_acks[msg['id']] = (msg, time.time())  # Update the timestamp in pending ACKs
             time.sleep(0.2)  # Check every 0.2 seconds
 
     def stop(self):
-        print("Shutting down robot client")
         self.running = False
         self.client_socket.shutdown(socket.SHUT_RDWR)
         self.client_socket.close()
