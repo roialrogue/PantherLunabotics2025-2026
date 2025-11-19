@@ -4,19 +4,18 @@ import json
 import queue
 import time
 
-# Laptop Client robot controller
-class Client:
+class Client: # Laptop Client robot controller
     def __init__(self, server_ip):
         self.host = server_ip
         self.port = 6767
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.input_queue = queue.Queue() # For incoming telemetry and ACKs
         self.output_queue = queue.Queue() # For outgoing commands and ACKs
-        self.telemetry_queue = queue.Queue() # Queue for incoming telemetry
+        self.telemetry_queue = queue.Queue() # Queue to send incoming telemetry
         self.running = True
         self.message_id = 1
         self.pending_acks = {}
-        self.ack_timeout = 1 # seconds
+        self.ack_timeout = 0.5 # seconds
 
     def connect(self):
         try:
@@ -31,7 +30,6 @@ class Client:
         threading.Thread(target=self._receiver_thread).start()
         threading.Thread(target=self._ack_monitor_thread).start()
 
-        # Process incoming telemetry and ACKs
         while self.running:
             try:
                 msg = self.input_queue.get(timeout=1)  # Wait up to 1 second for a message
@@ -58,7 +56,7 @@ class Client:
 
 
     def _receiver_thread(self):
-        stream = self.client_socket.makefile('r')  # Create a file-like object
+        stream = self.client_socket.makefile('r')
         try:
             while self.running:
                 raw = stream.readline()  # Read a line from the stream
@@ -67,11 +65,11 @@ class Client:
                     self.stop()
                     break
                 raw = raw.strip()  # Remove leading/trailing whitespace
-                if not raw:  # If the stripped string is empty
+                if not raw:  # If the string is empty
                     continue
                 msg = json.loads(raw)  # Parse the string as JSON
                 self.input_queue.put(msg)
-                print(f"[Client] Received: {msg}")
+                #print(f"[Client] Received: {msg}")
         finally:
             stream.close()
 
@@ -82,7 +80,7 @@ class Client:
         self.message_id += 1
         
     def _sender_thread(self):
-        stream = self.client_socket.makefile('w')  # Create a file-like object
+        stream = self.client_socket.makefile('w')
         try:
             while self.running:
                 try:
@@ -90,7 +88,7 @@ class Client:
                     json_str = json.dumps(msg) + '\n'  # Convert the message to JSON string
                     stream.write(json_str)  # Write the JSON string to the stream
                     stream.flush()  # Flush the stream to ensure data is sent immediately
-                    print(f"[Client] Sent: {msg}")
+                    #print(f"[Client] Sent: {msg}")
                 except queue.Empty:
                     continue
         finally:
@@ -107,7 +105,7 @@ class Client:
                 print(f"[Client] Resending unacknowledged message: {msg}")
                 self.output_queue.put(msg)
                 self.pending_acks[msg['id']] = (msg, time.time())  # Update the timestamp in pending ACKs
-            time.sleep(0.2)  # Check every 0.2 seconds
+            time.sleep(0.5)  # Check every 0.5 seconds
 
     def stop(self):
         self.running = False
