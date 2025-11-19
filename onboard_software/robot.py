@@ -1,50 +1,41 @@
-from onboard_software.server import Server
-import queue
-        
+import server
+import threading
+import time
+
 class Robot:
     def __init__(self):
+        self.current_mode = None
+        self.running = True
 
-        self.server = Server()
-        self.server.start()
+        # Initialize server
+        self.server = server.Server()
+        threading.Thread(target=self.server.start).start()
+        while self.server.get_command() != "READY":
+            time.sleep(0.1)
+        print("[Robot] Startup complete!")
 
-        data = self.server.cmd_input_queue.get()
-        if data == "TELEOP START":
-            self.teleop_ctrl.start()
-            self.mode = "TELEOP"
-        elif data == "AUTONOMOUS START":
-            self.auto_ctrl.start()
-            self.mode = "AUTO"
-
-
-    def toggle_mode(self, data):
-        if self.mode == "AUTO" and data == "SWITCH TO TELEOP":
-            print("[SUPERVISOR] Switching to TELEOP")
-            self.auto_ctrl.stop()
-            self.teleop_ctrl.start()
-            self.mode = "TELEOP"
-        elif self.mode == "TELEOP" and data == "SWITCH TO AUTONOMOUS":
-            print("[SUPERVISOR] Switching to AUTO")
-            self.teleop_ctrl.stop()
-            self.auto_ctrl.start()
-            self.mode = "AUTO"
+    def print_telemetry(self, data):
+        self.server.send_telemetry(data)
 
     def run(self):
-        
-        try:
-            while True:
-                try:
-                    data = self.server.cmd_input_queue.get_nowait()
-                except queue.Empty:
-                    data = None
+        num = 0
 
-                self.toggle_mode(data)
-                cmd = data
-                id = cmd[0]
+        while self.running:
 
-        except KeyboardInterrupt:
-            print("\n[CLIENT] Interrupted by user.")
-        finally:
-            print("[CLIENT] Shutting down.")
-            
+            cmd = self.server.get_command()
+            if cmd == "SHUTDOWN":
+                self.stop()
+                break
+
+            num += 1
+            if num % 50 == 0:
+                self.print_telemetry({"status": num, "command": cmd})
+            time.sleep(0.02)  # 50 Hz loop
+    
+    def stop(self):
+        print("[Robot] Stopping robot")
+        self.running = False
+        self.server.stop()
+
 if __name__ == "__main__":
     Robot().run()
