@@ -131,11 +131,8 @@ if __name__ == "__main__":
     while running_robot:
         cmd = server.get_command()
 
-        num += 1
         time.sleep(0.1)
-        if num % 50 == 0:
-            pass
-            #server.send_telemetry({"status": "operational", "counter": num})
+        server.send_telemetry({"status": "operational", "counter": num})
 
         if cmd == "SHUTDOWN":
             print("Shutting down robot server")
