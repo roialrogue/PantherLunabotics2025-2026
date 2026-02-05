@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/luna01/sparkcan-examples/src/status.cpp
+chrono
+-
+iomanip
+-
+iostream
+-
+SparkMax.hpp
+/home/luna01/sparkcan-examples/src/SparkMax.hpp
+
