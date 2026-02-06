@@ -39,7 +39,10 @@ std::vector<MotorFeedback> run_motor(std::string canbus, std::vector<int> motor_
 
         // Check if the motor is already connected  
         if (connectedMotors.find(motor_ID) == connectedMotors.end())
-            connectedMotors.emplace(motor_ID, SparkMax (canbus, motor_ID));
+            // connectedMotors.emplace(motor_ID, SparkMax (canbus, motor_ID));
+            connectedMotors.emplace(std::piecewise_construct,
+                                    std::forward_as_tuple(motor_ID),
+                                    std::forward_as_tuple(canbus, motor_ID));
             // Configure and burn parameters for NEO Vortex
             SparkMax& new_motor = connectedMotors.at(motor_ID);
             new_motor.SetIdleMode(IdleMode::kBrake);
