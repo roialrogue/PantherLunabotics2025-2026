@@ -4,12 +4,14 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/src/control.cpp" "/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles/example_control.dir/src/control.cpp.o"
+  "/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/src/motor_control.cpp" "/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles/motor_lib.dir/src/motor_control.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "/home/luna01/Lunabotics/PantherLunabotics2025-2026/lunaenv/lib/python3.10/site-packages/pybind11/include"
+  "/usr/local/python3.10/include/python3.10"
   )
 
 # Targets to which this target links.

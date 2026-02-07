@@ -1,4 +1,5 @@
-/home/luna01/sparkcan-examples/build/CMakeFiles/edit_cache.dir
-/home/luna01/sparkcan-examples/build/CMakeFiles/rebuild_cache.dir
-/home/luna01/sparkcan-examples/build/CMakeFiles/example_control.dir
-/home/luna01/sparkcan-examples/build/CMakeFiles/example_status.dir
+/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles/edit_cache.dir
+/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles/rebuild_cache.dir
+/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles/example_control.dir
+/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles/motor_lib.dir
+/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles/example_status.dir

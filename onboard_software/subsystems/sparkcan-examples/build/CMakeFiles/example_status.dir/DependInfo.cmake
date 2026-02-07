@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/luna01/sparkcan-examples/src/status.cpp" "/home/luna01/sparkcan-examples/build/CMakeFiles/example_status.dir/src/status.cpp.o"
+  "/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/src/status.cpp" "/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles/example_status.dir/src/status.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

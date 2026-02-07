@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/luna01/sparkcan-examples/src/status.cpp
+/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/src/status.cpp
 chrono
 -
 iomanip
@@ -14,5 +14,5 @@ iomanip
 iostream
 -
 SparkMax.hpp
-/home/luna01/sparkcan-examples/src/SparkMax.hpp
+/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/src/SparkMax.hpp
 

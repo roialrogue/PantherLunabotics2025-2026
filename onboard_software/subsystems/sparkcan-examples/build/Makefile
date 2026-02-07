@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/luna01/sparkcan-examples
+CMAKE_SOURCE_DIR = /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/luna01/sparkcan-examples/build
+CMAKE_BINARY_DIR = /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna01/sparkcan-examples/build/CMakeFiles /home/luna01/sparkcan-examples/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna01/sparkcan-examples/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/sparkcan-examples/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -124,6 +124,19 @@ example_control/fast:
 .PHONY : example_control/fast
 
 #=============================================================================
+# Target rules for targets named motor_lib
+
+# Build rule for target.
+motor_lib: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 motor_lib
+.PHONY : motor_lib
+
+# fast build rule for target.
+motor_lib/fast:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/build
+.PHONY : motor_lib/fast
+
+#=============================================================================
 # Target rules for targets named example_status
 
 # Build rule for target.
@@ -163,6 +176,33 @@ src/control.cpp.s:
 	$(MAKE) -f CMakeFiles/example_control.dir/build.make CMakeFiles/example_control.dir/src/control.cpp.s
 .PHONY : src/control.cpp.s
 
+src/motor_control.o: src/motor_control.cpp.o
+
+.PHONY : src/motor_control.o
+
+# target to build an object file
+src/motor_control.cpp.o:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/src/motor_control.cpp.o
+.PHONY : src/motor_control.cpp.o
+
+src/motor_control.i: src/motor_control.cpp.i
+
+.PHONY : src/motor_control.i
+
+# target to preprocess a source file
+src/motor_control.cpp.i:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/src/motor_control.cpp.i
+.PHONY : src/motor_control.cpp.i
+
+src/motor_control.s: src/motor_control.cpp.s
+
+.PHONY : src/motor_control.s
+
+# target to generate assembly for a file
+src/motor_control.cpp.s:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/src/motor_control.cpp.s
+.PHONY : src/motor_control.cpp.s
+
 src/status.o: src/status.cpp.o
 
 .PHONY : src/status.o
@@ -199,10 +239,14 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... example_control"
+	@echo "... motor_lib"
 	@echo "... example_status"
 	@echo "... src/control.o"
 	@echo "... src/control.i"
 	@echo "... src/control.s"
+	@echo "... src/motor_control.o"
+	@echo "... src/motor_control.i"
+	@echo "... src/motor_control.s"
 	@echo "... src/status.o"
 	@echo "... src/status.i"
 	@echo "... src/status.s"

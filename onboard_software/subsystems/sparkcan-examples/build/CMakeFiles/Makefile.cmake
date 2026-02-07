@@ -96,5 +96,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/example_control.dir/DependInfo.cmake"
+  "CMakeFiles/motor_lib.dir/DependInfo.cmake"
   "CMakeFiles/example_status.dir/DependInfo.cmake"
   )
