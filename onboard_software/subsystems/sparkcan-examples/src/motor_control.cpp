@@ -1,10 +1,11 @@
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
 #include <iostream>
 #include <map>
 #include <vector>
 #include <string>
 #include <memory>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
 #include "SparkMax.hpp"
 
@@ -38,7 +39,7 @@ std::vector<MotorFeedback> run_motor(std::string canbus, std::vector<int> motor_
         float dutyCycle = dutyCycles[i];
 
         // Check if the motor is already connected  
-        if (connectedMotors.find(motor_ID) == connectedMotors.end())
+        if (connectedMotors.find(motor_ID) == connectedMotors.end()){
             // connectedMotors.emplace(motor_ID, SparkMax (canbus, motor_ID));
             connectedMotors.emplace(std::piecewise_construct,
                                     std::forward_as_tuple(motor_ID),
@@ -55,13 +56,13 @@ std::vector<MotorFeedback> run_motor(std::string canbus, std::vector<int> motor_
             new_motor.SetSmartCurrentFreeLimit(20.0);
             new_motor.SetSmartCurrentStallLimit(80.0);
             new_motor.BurnFlash();        
-
+        }
         SparkMax& motor = connectedMotors.at(motor_ID);
 
         MotorFeedback data;
         motor.Heartbeat();
-        motor.SetDutyCycle(dutyCycle)
-        data.velocity = motor.GetVelocity();
+        motor.SetDutyCycle(dutyCycle);
+        data.motorVelocity = motor.GetVelocity();
         data.dutyCycle = motor.GetDutyCycle();
         
         feedbackList.push_back(data);
