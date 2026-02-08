@@ -1,9 +1,0 @@
-{
-    "cmake.sourceDirectory": "C:/Users/georg/Documents/GitHub/PantherLunabotics2025-2026/library/C++",
-    "cmake.ignoreCMakeListsMissing": true,
-    "python-envs.pythonProjects": [],
-    "python.analysis.extraPaths": [
-        "${workspaceFolder}/onboard_software/subsystems"
-    ]
-    //TODO: Fix path when motor_lib is built
-}
