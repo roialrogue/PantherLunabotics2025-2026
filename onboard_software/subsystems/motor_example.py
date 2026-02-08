@@ -1,13 +1,9 @@
-# 
-
 import sys
 import os
 
 # Adds the 'build' directory to the list of places Python looks for modules
 sys.path.append(os.path.join(os.getcwd(), 'build'))
-
 import motor_lib
-import time
 
 def test_motor_bindings():
     print("--- SparkMax C++ Binding Test ---")
