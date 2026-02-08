@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 1. SET PATHS
-set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../library/sparkcan")
+set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../library/sparkcan")
 set(PYBIND_INC_ENV "/home/luna01/Lunabotics/PantherLunabotics2025-2026/lunaenv/lib/python3.10/site-packages/pybind11/include")
 set(PYTHON_INC_ENV "/usr/local/python3.10/include/python3.10")
 
