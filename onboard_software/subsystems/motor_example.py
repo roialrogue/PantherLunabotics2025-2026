@@ -42,5 +42,5 @@ def test_motor_bindings():
         print(f"\n[BINDING OK, HARDWARE OFFLINE]")
         print(f"The Python-to-C++ call worked, but the SparkMax driver reported: {e}")
 
-if name == "main":
+if __name__ == "__main__":
     test_motor_bindings()
