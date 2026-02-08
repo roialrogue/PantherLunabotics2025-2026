@@ -2,7 +2,7 @@ from __future__ import annotations
 import robot
 
 
-class Teleop:
+class TeleOp:
     def __init__(self, robot: robot.Robot):
         self.robot = robot
 
