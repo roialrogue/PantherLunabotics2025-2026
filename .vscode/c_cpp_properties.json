@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Linux (for Jetson)",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/onboard_software/subsystems/sparkcan/include",
+                "C:/Users/asher/OneDrive - Florida Institute of Technology/Desktop/PyBind11/venv/lib/python3.12/site-packages/pybind11/include",
+                "C:/msys64/ucrt64/include/python3.12",
+                "/usr/include",
+                "/usr/include/linux",
+                "/usr/local/include"
+            ],
+            "defines": [
+                "__linux__",
+                "__GNUC__"
+            ],
+            "compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-arm64"
+        }
+    ],
+    "version": 4
+}
