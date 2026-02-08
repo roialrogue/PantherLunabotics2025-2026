@@ -131,7 +131,7 @@ public:
     }
 
     // Update all motors: send commands and collect feedback (call this in main loop)
-    std::map<int, MotorFeedback> Update() 
+    void Update() 
     {
         for (auto& pair : connectedMotors) 
         {
@@ -153,8 +153,6 @@ public:
 
             motorFeedback[motor_ID] = data;
         }
-
-        return motorFeedback;
     }
 
     // Set desired duty cycle for a single motor
