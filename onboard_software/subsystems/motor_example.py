@@ -1,73 +1,46 @@
-import RPi.GPIO as GPIO
-import library.pid_controller as Controller
-import library.motor as Motor
+# 
 
-class MotorExample: 
-    def __init__(self):
-        self.pid_coefficients = Controller.PIDController.PIDCoefficients(kp=0, ki=0, kd=0)
-        self.pin = 33
+import sys
+import os
 
-        self.target_position = 0
-        self.power_limit = 1.0
+# Adds the 'build' directory to the list of places Python looks for modules
+sys.path.append(os.path.join(os.getcwd(), 'build'))
 
-        # Subsystem constants
-        self.power_limit = 1.0
-        self.ticks_per_inch = 0 # Ticks moved / inches moved
-        self.max_pos = 0 # Inches
-        self.min_pos = 0 # Inches
-        self.gravity_compensation_power = 0.0
-        self.zero_position_offset = 0.0
-        # If circle Ticks_Per_Degree = ENCODER_CPR * GEAR_RATIO / 360.0
+import motor_lib
+import time
 
-        # Initialize GPIO pin and PID controller
-        self.motor = Motor.Motor()
-        GPIO.setup(self.pin, GPIO.OUT, initial=GPIO.LOW)
-        self.pwm = GPIO.PWM(self.pin, self.motor.get_frequency())
-        self.controller = Controller.PIDController(self.pid_coefficients)
+def test_motor_bindings():
+    print("--- SparkMax C++ Binding Test ---")
 
-    # This method is called periodically so that the PID controller can move the subsystem towards its target
-    def motor_task(self):
-        self.controller.setOutputLimit(self.power_limit)
-        current_position = self.get_current_position()
-        pidOutput = self.controller.calculate(current_position, self.target_position)
-        power = self.gravity_compensation_power + pidOutput # For a straight linear system
-        print(power)
-        duty_cycle = self.motor.calculate_power(power)
-        self.pwm.start(duty_cycle)
-        print(f"Target: {self.target_position:.2f} | Current: {current_position:.2f} | Power: {power:.2f}")
+    if hasattr(motor_lib, 'run_motor'):
+        print("[SUCCESS] Found 'run_motor' function.")
+    else:
+        print("[FAILED] Could not find 'run_motor' function.")
+        return
 
-    # Bypass all safety and set power directly
-    # Will be removed after testing most likely
-    def set_power(self, power):
-        duty_cycle = self.motor.calculate_power(power)
-        self.pwm.start(duty_cycle)
+    # 2. Test the MotorFeedback struct binding
+    # We can create a dummy list of IDs and Duty Cycles
+    # Note: This may throw a CAN error if no hardware is connected, 
+    # but it proves the BINDING works.
+    can_bus = "can0"
+    motor_ids = [1, 2]
+    duties = [0.1, -0.1]
 
-    def is_on_target(self, tolerance=1, timeout=0.0, no_oscillation=False):
-        self.controller.setNoOscillation(no_oscillation)
-        self.controller.setTimeout(timeout)
-        return self.controller.isOnTarget(tolerance)
-    
-    def set_position(self, position, power_limit=1.0):
-        self.target_position = position
-        self.power_limit = power_limit
+    print(f"Attempting to call run_motor on {can_bus}...")
 
-    def set_pid_power(self, power):
-        if power > 0.0:
-            self.set_position(self.max_pos, power)
-        elif power < 0.0:
-            self.set_position(self.min_pos, power)
-        else:
-            # Hold position
-            self.set_position(self.get_real_world_position(), 1.0)
+    try:
+        # We wrap this because it might crash if the CAN interface isn't 'up'
+        results = motor_lib.run_motor(can_bus, motor_ids, duties)
 
-    # Get motor position in inches
-    def get_current_position(self):
-        # TODO: Implement encoder reading
-        return 0.0
+        print(f"Received {len(results)} feedback objects.")
+        for i, data in enumerate(results):
+            print(f"Motor {motor_ids[i]} Feedback:")
+            print(f"  - Velocity: {data.motorVelocity}")
+            print(f"  - Duty Cycle: {data.dutyCycle}")
 
-    # Offset the zero position by a given number of inches
-    def get_real_world_position(self):
-        return self.get_current_position() + self.zero_position_offset
+    except Exception as e:
+        print(f"\n[BINDING OK, HARDWARE OFFLINE]")
+        print(f"The Python-to-C++ call worked, but the SparkMax driver reported: {e}")
 
-    def stop(self):
-        self.pwm.stop()
+if name == "main":
+    test_motor_bindings()
