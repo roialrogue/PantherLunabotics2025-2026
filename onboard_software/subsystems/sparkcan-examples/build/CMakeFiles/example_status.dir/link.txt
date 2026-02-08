@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/example_status.dir/src/status.cpp.o  -o example_status -lsparkcan 
