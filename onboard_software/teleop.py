@@ -1,50 +1,47 @@
-import time
-import random
+from __future__ import annotations
+import robot
 
-'''
-Axis 0 - Left Stick (L = -1, R = 1)
-Axis 1 - Left Stick (T = -1, D = 1)
-Axis 2 - Right Stick (L = -1, R = 1)
-Axis 3 - Right Stick (T = -1, D = 1)
 
-Axis 4 - Left Trigger (unpressed = -1, pressed = 1)
-Axis 5 - Left Trigger (unpressed = -1, pressed = 1)
-
-Button 0 - A
-Button 1 - B
-Button 2 - X
-Button 3 - Y
-Button 4 - LB
-Button 5 - RB
-Button 6 - Options
-Button 7 - Start
-'''
-
-class TeleopController:
-    def __init__(self, robot):
-        self.active = False
+class Teleop:
+    def __init__(self, robot: robot.Robot):
         self.robot = robot
 
-    def start(self):
-        self.active = True
-        print("[TELEOP] Teleop control started")
+    # Called only when there is a button event
+    def on_button_event(self, button, is_pressed):
+        if button == 'A':
+            if is_pressed:
+                print("[TELEOP] A button pressed")
+            else:
+                print("[TELEOP] A button released")
+        elif button == 'B':
+            if is_pressed:
+                print("[TELEOP] B button pressed")
+            else:
+                print("[TELEOP] B button released")
+        elif button == 'X':
+            if is_pressed:
+                print("[TELEOP] X button pressed")
+            else:
+                print("[TELEOP] X button released")
+        elif button == 'Y':
+            if is_pressed:
+                print("[TELEOP] Y button pressed")
+            else:
+                print("[TELEOP] Y button released")
+        elif button == 'LB':
+            if is_pressed:
+                print("[TELEOP] LB button pressed")
+            else:
+                print("[TELEOP] LB button released")
+        elif button == 'RB':
+            if is_pressed:
+                print("[TELEOP] RB button pressed")
+            else:
+                print("[TELEOP] RB button released")
 
-    def stop(self):
-        self.active = False
-        print("[TELEOP] Teleop control stopped")
+    def run_teleOp_step(self):
+        pass
 
-    def run_step(self, cmd):
-        """Read joystick state and convert to control commands."""
-        if not self.active:
-            return
-        #print(cmd)
-        x = cmd[0]
-        print(x)
-
-        # Method A
-        #self.robot.subsystem_motor.set_power(x)
-
-        telem = random.sample(range(1, 101), 6)
-        
-        time.sleep(0.1)
-        return telem
+        # Telemetry can not be run in this loop to low frequency (clogs up client server coms)
+        # joystick_values = self.robot.controller.AxisValues.__str__()
+        # self.robot.print_telemetry(f"Joystick values: {joystick_values}")

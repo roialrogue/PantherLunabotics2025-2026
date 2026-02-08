@@ -1,80 +1,106 @@
-from onboard_software.autonomous import AutonomousController
-from onboard_software.teleop import TeleopController
-from onboard_software.server import Server
-import queue
-import RPi.GPIO as GPIO
-from onboard_software.subsystems.motor_example import MotorExample
+from __future__ import annotations
+import server
+import threading
+import time
+import teleOp
+import auto
+from dataclasses import dataclass
+
+@dataclass
+class AxisValues:
+    x: float = 0.0
+    y: float = 0.0
+    yaw_rate: float = 0.0
+    pitch_rate: float = 0.0
+    lt: float = 0.0
+    rt: float = 0.0
+
+    def update(self, cmd):
+        self.x = cmd[1]
+        self.y = cmd[2]
+        self.yaw_rate = cmd[3]
+        self.pitch_rate = cmd[4]
+        self.lt = cmd[5]
+        self.rt = cmd[6]
+
+    def __str__(self):
+        return (f"Axis State:"
+                f"  X: {self.x},"
+                f"  Y: {self.y},"
+                f"  Yaw Rate: {self.yaw_rate},"
+                f"  Pitch Rate: {self.pitch_rate},"
+                f"  Left Trigger: {self.lt},"
+                f"  Right Trigger: {self.rt}")
+
+class Controller:
+    def __init__(self, robot: Robot):
+        self.robot = robot
+        self.AxisValues = AxisValues()
         
+
+    def process_axes(self, cmd):
+        self.AxisValues.update(cmd)
+        #print(f"[Controller] {self.AxisValues.__str__()}")
+
+    def process_buttons(self, cmd):
+        
+        mode, button, action = cmd
+        is_pressed = (action == "PRESSED")
+
+        if self.robot.current_mode == "TELEOP":
+            self.robot.teleop.on_button_event(button, is_pressed)
+        elif self.robot.current_mode == "AUTO":
+            self.robot.auto.on_button_event(button, is_pressed)
+
+    def process_controller_inputs(self, cmd):
+        if len(cmd) > 4 and cmd[0] == "TELEOP": # For now only TELEOP uses axes
+            self.process_axes(cmd)
+        else:
+            self.process_buttons(cmd)
+
 class Robot:
     def __init__(self):
-        self.robot = RobotCore()
-        self.auto_ctrl = AutonomousController(self.robot)
-        self.teleop_ctrl = TeleopController(self.robot)
+        self.current_mode = None
+        self.running = True
 
-        self.server = Server()
-        self.server.start()
+        # Initialize server
+        self.server = server.Server()
+        threading.Thread(target=self.server.start).start()
 
-        data = self.server.cmd_input_queue.get()
-        if data[0] == "TELEOP START":
-            self.teleop_ctrl.start()
-            self.mode = "TELEOP"
-        elif data[0] == "AUTONOMOUS START":
-            self.auto_ctrl.start()
-            self.mode = "AUTO"
+        # Initialize controller and run modes
+        self.controller = Controller(self)
+        self.teleop = teleOp.Teleop(self)
+        self.auto = auto.Auto(self)
 
+        while self.server.get_command() != "READY":
+            time.sleep(0.1)
+        print("[Robot] Startup complete!")
 
-    def toggle_mode(self, data):
-        if self.mode == "AUTO" and data == "SWITCH TO TELEOP":
-            print("[SUPERVISOR] Switching to TELEOP")
-            self.auto_ctrl.stop()
-            self.teleop_ctrl.start()
-            self.mode = "TELEOP"
-        elif self.mode == "TELEOP" and data == "SWITCH TO AUTONOMOUS":
-            print("[SUPERVISOR] Switching to AUTO")
-            self.teleop_ctrl.stop()
-            self.auto_ctrl.start()
-            self.mode = "AUTO"
+    def print_telemetry(self, data):
+        self.server.send_telemetry(data)
 
     def run(self):
-        id = self.mode # startup mode initialisation
-        try:
-            while True:
-                try:
-                    data = self.server.cmd_input_queue.get_nowait()
-                    id = data[0]
-                    print(id)
-                    if id.startswith("SWITCH"):
-                         self.toggle_mode(id)
 
-      
-                except queue.Empty:
-                    data = None
+        while self.running:
 
-                cmd = data
-                print(self.mode)
-                if self.mode == "AUTO" and id == "AUTO":
-                    telem = self.auto_ctrl.run_step(cmd)
-                    self.server.telem_output_queue.put(telem)
-                elif self.mode == "TELEOP" and id == "TELEOP":
-                    telem = self.teleop_ctrl.run_step(cmd)
-                    self.server.telem_output_queue.put(telem)
+            cmd = self.server.get_command()
+            if cmd == "SHUTDOWN":
+                self.stop()
+                break
 
-        except KeyboardInterrupt:
-            print("\n[CLIENT] Interrupted by user.")
-        finally:
-            # self.server.close()
-            self.robot.stop()
+            if cmd is not None:
+                self.current_mode = cmd[0]
+                self.controller.process_controller_inputs(cmd)
 
-class RobotCore:
-    def __init__(self):
-        # Contains all subsystems and initializes GPIO
-        GPIO.setmode(GPIO.BOARD)
-        self.subsystem_motor = MotorExample()
-
+            if self.current_mode == "TELEOP":
+                self.teleop.run_teleOp_step()
+            elif self.current_mode == "AUTO":
+                self.auto.run_auto_step()
+    
     def stop(self):
-        GPIO.cleanup()
-        self.subsystem_motor.stop()
-        
+        print("[Robot] Stopping robot")
+        self.running = False
+        self.server.stop()
 
 if __name__ == "__main__":
     Robot().run()
