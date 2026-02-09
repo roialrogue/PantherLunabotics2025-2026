@@ -40,8 +40,5 @@ class TeleOp:
                 print("[TELEOP] RB button released")
 
     def run_teleOp_step(self):
-        pass
 
-        # Telemetry can not be run in this loop to low frequency (clogs up client server coms)
-        # joystick_values = self.robot.controller.AxisValues.__str__()
-        # self.robot.print_telemetry(f"Joystick values: {joystick_values}")
+        #self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])

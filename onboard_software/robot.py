@@ -1,6 +1,7 @@
 from __future__ import annotations
 import os
 import sys
+from drivetrain import Drivetrain
 import server
 import threading
 import time
@@ -10,7 +11,7 @@ from library.Controller import Controller
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../library/motor_controller/build'))
 try:
-    import motor_controller as mc
+    import motor_controller
 except ImportError as e:
     print(f"ERROR: Failed to import motor_controller module: {e}")
     print("Make sure the module is compiled and the path is correct")
@@ -23,8 +24,8 @@ class Robot:
         self.running = True
 
         # Initialize hardware
-        self.core = RobotCore()
-        self.core.intializeHardware()
+        self.motor_controller = motor_controller.MotorController().getInstance("can0")
+        self.drivetrain = Drivetrain(self.motor_controller)
 
         # Initialize server
         self.server = server.Server()
@@ -64,11 +65,7 @@ class Robot:
         print("[Robot] Stopping robot")
         self.running = False
         self.server.stop()
-
-class RobotCore:
-    def intializeHardware(self):
-        print("[RobotCore] Initializing hardware")
-        self.motor_controller = mc.MotorController().getInstance("can0")
+        self.drivetrain.stop()
         
 if __name__ == "__main__":
     Robot().run()
