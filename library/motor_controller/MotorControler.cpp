@@ -205,7 +205,7 @@ public:
     }
 
     // Get all feedback for all initialized motors
-    std::map<int, MotorFeedback>& GetAllFeedback() const 
+    std::map<int, MotorFeedback>& GetAllFeedback()
     {
         return motorFeedback;
     }

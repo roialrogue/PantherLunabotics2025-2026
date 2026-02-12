@@ -66,7 +66,7 @@ CMAKE_BINARY_DIR = /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_so
 CMakeFiles/motor_lib.dir/all:
 	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/depend
 	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/build/CMakeFiles --progress-num= "Built target motor_lib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target motor_lib"
 .PHONY : CMakeFiles/motor_lib.dir/all
 
 # Include target in all.
@@ -76,7 +76,7 @@ all: CMakeFiles/motor_lib.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/motor_lib.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/build/CMakeFiles 5
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/motor_lib.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/build/CMakeFiles 0
 .PHONY : CMakeFiles/motor_lib.dir/rule

@@ -57,7 +57,130 @@ include CMakeFiles/motor_lib.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/motor_lib.dir/flags.make
 
-CMakeFiles/motor_lib.dir/requires:
+CMakeFiles/motor_lib.dir/motor_control.cpp.o: CMakeFiles/motor_lib.dir/flags.make
+CMakeFiles/motor_lib.dir/motor_control.cpp.o: ../motor_control.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/motor_lib.dir/motor_control.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/motor_lib.dir/motor_control.cpp.o -c /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/motor_control.cpp
+
+CMakeFiles/motor_lib.dir/motor_control.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/motor_lib.dir/motor_control.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/motor_control.cpp > CMakeFiles/motor_lib.dir/motor_control.cpp.i
+
+CMakeFiles/motor_lib.dir/motor_control.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/motor_lib.dir/motor_control.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/motor_control.cpp -o CMakeFiles/motor_lib.dir/motor_control.cpp.s
+
+CMakeFiles/motor_lib.dir/motor_control.cpp.o.requires:
+
+.PHONY : CMakeFiles/motor_lib.dir/motor_control.cpp.o.requires
+
+CMakeFiles/motor_lib.dir/motor_control.cpp.o.provides: CMakeFiles/motor_lib.dir/motor_control.cpp.o.requires
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/motor_control.cpp.o.provides.build
+.PHONY : CMakeFiles/motor_lib.dir/motor_control.cpp.o.provides
+
+CMakeFiles/motor_lib.dir/motor_control.cpp.o.provides.build: CMakeFiles/motor_lib.dir/motor_control.cpp.o
+
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o: CMakeFiles/motor_lib.dir/flags.make
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o: /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o -c /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp > CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.i
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp -o CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.s
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o.requires:
+
+.PHONY : CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o.requires
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o.provides: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o.requires
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o.provides.build
+.PHONY : CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o.provides
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o.provides.build: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o
+
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o: CMakeFiles/motor_lib.dir/flags.make
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o: /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o -c /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp > CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.i
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp -o CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.s
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o.requires:
+
+.PHONY : CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o.requires
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o.provides: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o.requires
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o.provides.build
+.PHONY : CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o.provides
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o.provides.build: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o
+
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o: CMakeFiles/motor_lib.dir/flags.make
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o: /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o -c /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp > CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.i
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp -o CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.s
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o.requires:
+
+.PHONY : CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o.requires
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o.provides: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o.requires
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o.provides.build
+.PHONY : CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o.provides
+
+CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o.provides.build: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o
+
+
+# Object files for target motor_lib
+motor_lib_OBJECTS = \
+"CMakeFiles/motor_lib.dir/motor_control.cpp.o" \
+"CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o" \
+"CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o" \
+"CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o"
+
+# External object files for target motor_lib
+motor_lib_EXTERNAL_OBJECTS =
+
+motor_lib.so: CMakeFiles/motor_lib.dir/motor_control.cpp.o
+motor_lib.so: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o
+motor_lib.so: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o
+motor_lib.so: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o
+motor_lib.so: CMakeFiles/motor_lib.dir/build.make
+motor_lib.so: CMakeFiles/motor_lib.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/luna01/Lunabotics/PantherLunabotics2025-2026/onboard_software/subsystems/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX shared module motor_lib.so"
+	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/motor_lib.dir/link.txt --verbose=$(VERBOSE)
+
+# Rule to build all files generated by this target.
+CMakeFiles/motor_lib.dir/build: motor_lib.so
+
+.PHONY : CMakeFiles/motor_lib.dir/build
+
+CMakeFiles/motor_lib.dir/requires: CMakeFiles/motor_lib.dir/motor_control.cpp.o.requires
+CMakeFiles/motor_lib.dir/requires: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o.requires
+CMakeFiles/motor_lib.dir/requires: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o.requires
+CMakeFiles/motor_lib.dir/requires: CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o.requires
 
 .PHONY : CMakeFiles/motor_lib.dir/requires
 

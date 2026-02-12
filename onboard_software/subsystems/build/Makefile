@@ -123,6 +123,114 @@ motor_lib/fast:
 	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/build
 .PHONY : motor_lib/fast
 
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.o: home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o
+
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.o
+
+# target to build an object file
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.o
+
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.i: home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.i
+
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.i
+
+# target to preprocess a source file
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.i:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.i
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.i
+
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.s: home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.s
+
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.s
+
+# target to generate assembly for a file
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.s:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.s
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp.s
+
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.o: home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o
+
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.o
+
+# target to build an object file
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.o
+
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.i: home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.i
+
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.i
+
+# target to preprocess a source file
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.i:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.i
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.i
+
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.s: home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.s
+
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.s
+
+# target to generate assembly for a file
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.s:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.s
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp.s
+
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.o: home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o
+
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.o
+
+# target to build an object file
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.o
+
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.i: home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.i
+
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.i
+
+# target to preprocess a source file
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.i:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.i
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.i
+
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.s: home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.s
+
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.s
+
+# target to generate assembly for a file
+home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.s:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.s
+.PHONY : home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.cpp.s
+
+motor_control.o: motor_control.cpp.o
+
+.PHONY : motor_control.o
+
+# target to build an object file
+motor_control.cpp.o:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/motor_control.cpp.o
+.PHONY : motor_control.cpp.o
+
+motor_control.i: motor_control.cpp.i
+
+.PHONY : motor_control.i
+
+# target to preprocess a source file
+motor_control.cpp.i:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/motor_control.cpp.i
+.PHONY : motor_control.cpp.i
+
+motor_control.s: motor_control.cpp.s
+
+.PHONY : motor_control.s
+
+# target to generate assembly for a file
+motor_control.cpp.s:
+	$(MAKE) -f CMakeFiles/motor_lib.dir/build.make CMakeFiles/motor_lib.dir/motor_control.cpp.s
+.PHONY : motor_control.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -132,6 +240,18 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... motor_lib"
 	@echo "... edit_cache"
+	@echo "... home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.o"
+	@echo "... home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.i"
+	@echo "... home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.s"
+	@echo "... home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.o"
+	@echo "... home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.i"
+	@echo "... home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.s"
+	@echo "... home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.o"
+	@echo "... home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.i"
+	@echo "... home/luna01/Lunabotics/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkMax.s"
+	@echo "... motor_control.o"
+	@echo "... motor_control.i"
+	@echo "... motor_control.s"
 .PHONY : help
 
 
