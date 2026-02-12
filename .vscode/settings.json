@@ -4,6 +4,7 @@
     "python-envs.pythonProjects": [],
     "python.analysis.extraPaths": [
         "${workspaceFolder}/onboard_software/subsystems"
-    ]
+    ],
+    "claudeCodeChat.permissions.yoloMode": false
     //TODO: Fix path when motor_lib is built
 }
