@@ -28,18 +28,18 @@ class TestMotorController:
 
     def log_pass(self, test_name):
         """Log a passed test"""
-        print(f"✓ PASS: {test_name}")
+        print(f"  PASS: {test_name}")
         self.passed += 1
 
     def log_fail(self, test_name, error):
         """Log a failed test"""
-        print(f"✗ FAIL: {test_name}")
+        print(f"  FAIL: {test_name}")
         print(f"  Error: {error}")
         self.failed += 1
 
     def log_skip(self, test_name, reason):
         """Log a skipped test"""
-        print(f"⊘ SKIP: {test_name}")
+        print(f"  SKIP: {test_name}")
         print(f"  Reason: {reason}")
 
     def test_module_imports(self):
@@ -47,12 +47,11 @@ class TestMotorController:
         print("\n=== Testing Module Imports ===")
 
         try:
-            # Test enum imports
             assert hasattr(mc, 'IdleMode'), "IdleMode enum not found"
             assert hasattr(mc.IdleMode, 'COAST'), "IdleMode.COAST not found"
             assert hasattr(mc.IdleMode, 'BRAKE'), "IdleMode.BRAKE not found"
             self.log_pass("IdleMode enum import")
-        except AssertionError as e:
+        except Exception as e:
             self.log_fail("IdleMode enum import", e)
 
         try:
@@ -60,7 +59,7 @@ class TestMotorController:
             assert hasattr(mc.MotorType, 'BRUSHED'), "MotorType.BRUSHED not found"
             assert hasattr(mc.MotorType, 'BRUSHLESS'), "MotorType.BRUSHLESS not found"
             self.log_pass("MotorType enum import")
-        except AssertionError as e:
+        except Exception as e:
             self.log_fail("MotorType enum import", e)
 
         try:
@@ -68,7 +67,7 @@ class TestMotorController:
             assert hasattr(mc.SensorType, 'NO_SENSOR'), "SensorType.NO_SENSOR not found"
             assert hasattr(mc.SensorType, 'HALL_SENSOR'), "SensorType.HALL_SENSOR not found"
             self.log_pass("SensorType enum import")
-        except AssertionError as e:
+        except Exception as e:
             self.log_fail("SensorType enum import", e)
 
         try:
@@ -91,6 +90,13 @@ class TestMotorController:
         except Exception as e:
             self.log_fail("MotorConfig structure", e)
 
+        try:
+            assert hasattr(mc, 'MotorController'), "MotorController class not found"
+            assert hasattr(mc.MotorController, 'get_instance'), "MotorController.get_instance not found"
+            self.log_pass("MotorController class import")
+        except Exception as e:
+            self.log_fail("MotorController class import", e)
+
     def test_singleton_pattern(self):
         """Test that MotorController follows singleton pattern"""
         print("\n=== Testing Singleton Pattern ===")
@@ -110,7 +116,7 @@ class TestMotorController:
             try:
                 mc.MotorController.get_instance("can1")
                 self.log_fail("Singleton CAN bus immutability", "Should have raised error")
-            except RuntimeError as expected:
+            except RuntimeError:
                 self.log_pass("Singleton CAN bus immutability")
         except Exception as e:
             self.log_fail("Singleton CAN bus immutability", e)
@@ -269,6 +275,16 @@ class TestMotorController:
         except Exception as e:
             self.log_fail("Get all motor feedback", e)
 
+        # Test getting feedback for uninitialized motor (should raise error)
+        try:
+            try:
+                controller.get_motor_feedback(99)
+                self.log_fail("Get feedback for uninitialized motor", "Should have raised error")
+            except RuntimeError:
+                self.log_pass("Get feedback for uninitialized motor (error expected)")
+        except Exception as e:
+            self.log_fail("Get feedback for uninitialized motor", e)
+
     def test_feedback_caching(self):
         """Test that feedback is cached and not queried on get calls"""
         print("\n=== Testing Feedback Caching Architecture ===")
@@ -392,10 +408,10 @@ class TestMotorController:
         print(f"Total:   {self.passed + self.failed}")
 
         if self.failed == 0:
-            print("\n✓ ALL TESTS PASSED!")
+            print("\nALL TESTS PASSED!")
             return 0
         else:
-            print(f"\n✗ {self.failed} TEST(S) FAILED")
+            print(f"\n{self.failed} TEST(S) FAILED")
             return 1
 
 
