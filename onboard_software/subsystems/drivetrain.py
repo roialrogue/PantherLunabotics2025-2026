@@ -1,25 +1,26 @@
 import math
 from library.util import Util
+import motor_controller
 
 class Drivetrain:
 
     def __init__(self, mc):
         self.slow_turning = True
-        self.max_speed = 1.0
+        self.max_speed = 0.1
 
         self.mc = mc
         self.motor_ids = [1, 2, 3, 4] # Example motor IDs for a 4-motor drivetrain
 
-        config = mc.MotorConfig()
-        config.idle_mode = mc.IdleMode.BRAKE
-        config.motor_type = mc.MotorType.BRUSHLESS
-        config.sensor_type = mc.SensorType.HALL_SENSOR
-        config.ramp_rate = 0.1
+        config = motor_controller.MotorConfig()
+        config.idle_mode = motor_controller.IdleMode.BRAKE
+        config.motor_type = motor_controller.MotorType.BRUSHLESS
+        config.sensor_type = motor_controller.SensorType.HALL_SENSOR
+        config.ramp_rate = 0.0
         config.inverted = False
-        config.motor_kv = 560
-        config.encoder_counts_per_rev = 7168
+        config.motor_kv = 480
+        config.encoder_counts_per_rev = 4096
         config.smart_current_free_limit = 20.0
-        config.smart_current_stall_limit = 20.0
+        config.smart_current_stall_limit = 80.0
 
         self.mc.initialize_motors(self.motor_ids, config)
 
