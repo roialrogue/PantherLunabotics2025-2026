@@ -6,12 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 1. SET PATHS
 set(SPARKCAN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/sparkcan")
+set(PYBIND_INC_ENV "/home/luna01/Lunabotics/PantherLunabotics2025-2026/lunaenv/lib/python3.10/site-packages/pybind11/include")
+set(PYTHON_INC_ENV "/usr/local/python3.10/include/python3.10")
 
-# 2. FIND PYTHON AND PYBIND11
-find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-find_package(pybind11 CONFIG REQUIRED)
-
-# 3. DEFINE THE MODULE
+# 2. DEFINE THE MODULE
 # Create Python module from MotorControler.cpp
 pybind11_add_module(motor_controller
     MotorControler.cpp
@@ -20,8 +18,10 @@ pybind11_add_module(motor_controller
     ${SPARKCAN_DIR}/src/SparkFlex.cpp
 )
 
-# 4. INCLUDE DIRECTORIES
+# 3. INCLUDE DIRECTORIES
 target_include_directories(motor_controller PRIVATE
+    ${PYBIND_INC_ENV}
+    ${PYTHON_INC_ENV}
     ${SPARKCAN_DIR}/include
 )
 
