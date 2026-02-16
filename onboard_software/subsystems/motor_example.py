@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 
 # Adds the 'build' directory to the list of places Python looks for modules
 sys.path.append(os.path.join(os.getcwd(), 'build'))
@@ -19,20 +20,28 @@ def test_motor_bindings():
     # Note: This may throw a CAN error if no hardware is connected, 
     # but it proves the BINDING works.
     can_bus = "can0"
-    motor_ids = [1, 2]
-    duties = [0.1, -0.1]
+    motor_ids = [1, 2, 7, 4]
+    duties = [0.1, 0.1, 0.1, -0.2]
 
     print(f"Attempting to call run_motor on {can_bus}...")
 
     try:
         # We wrap this because it might crash if the CAN interface isn't 'up'
-        results = motor_lib.run_motor(can_bus, motor_ids, duties)
+        while True:
+            start_time = time.time()
+            results = motor_lib.run_motor(can_bus, motor_ids, duties)
 
-        print(f"Received {len(results)} feedback objects.")
-        for i, data in enumerate(results):
-            print(f"Motor {motor_ids[i]} Feedback:")
-            print(f"  - Velocity: {data.motorVelocity}")
-            print(f"  - Duty Cycle: {data.dutyCycle}")
+            print(f"Received {len(results)} feedback objects.")
+            for i, data in enumerate(results):
+                print(f"Motor {motor_ids[i]} Feedback:")
+                print(f"  - Velocity: {data.motorVelocity}")
+                print(f"  - Duty Cycle: {data.dutyCycle}")
+            
+            elapsed = time.time() - start_time
+            sleep_time = 0.1 - elapsed
+            
+            if sleep_time > 0:
+                time.sleep(sleep_time)
 
     except Exception as e:
         print(f"\n[BINDING OK, HARDWARE OFFLINE]")
