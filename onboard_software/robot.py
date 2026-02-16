@@ -11,7 +11,7 @@ from library.Controller import Controller
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../library/motor_controller/build'))
 try:
-    import motor_controller
+    import motor_controller as mc
 except ImportError as e:
     print(f"ERROR: Failed to import motor_controller module: {e}")
     print("Make sure the module is compiled and the path is correct")
@@ -24,7 +24,7 @@ class Robot:
         self.running = True
 
         # Initialize hardware
-        self.motor_controller = motor_controller.MotorController().getInstance("can0")
+        self.motor_controller = mc.MotorController.get_instance("can0")
         self.drivetrain = Drivetrain(self.motor_controller)
 
         # Initialize server
