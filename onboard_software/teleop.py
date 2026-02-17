@@ -51,7 +51,11 @@ class TeleOp:
             else:
                 print("[TELEOP] RB button released")
 
+    def perodic_loop(self):
+        # impliment code here
+
     def run_teleOp_step(self):
         pass
 
         #self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
+        

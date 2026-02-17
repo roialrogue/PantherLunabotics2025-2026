@@ -28,17 +28,17 @@ def test_example():
 
     mc.initialize_motor(motor_id, config)
 
-    print("Running motor at 50% power for 2 seconds...")
+    print("Starting motor test...")
     start_time = time.time()
     while time.time() - start_time < 5:
         if time.time() - start_time < 2:
             mc.set_motor_duty_cycle(motor_id, 0.1)
         elif time.time() - start_time < 4:
             mc.set_motor_duty_cycle(motor_id, -0.1)
-        #else:
-            #mc.set_motor_duty_cycle(motor_ids, 0.0)
-        duty = mc.get_current_duty_cycle(motor_id)
-        print(f"duty_cycle: {duty}")
+        else:
+            mc.set_motor_duty_cycle(motor_id, 0.0)
+        mc.update()
+        
     print("Motor test complete.")
 
 if __name__ == "__main__":
