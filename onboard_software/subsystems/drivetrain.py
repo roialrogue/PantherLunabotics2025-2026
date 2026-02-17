@@ -9,7 +9,7 @@ class Drivetrain:
         self.max_speed = 0.1
 
         self.mc = mc
-        self.motor_ids = [1, 2, 3, 4] # Example motor IDs for a 4-motor drivetrain
+        self.motor_ids = [6, 2, 3, 4] #Order: front right, front left, back right, back left
 
         config = motor_controller.MotorConfig()
         config.idle_mode = motor_controller.IdleMode.BRAKE
