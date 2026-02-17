@@ -4,7 +4,7 @@ import time
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../library/motor_controller/build'))
 try:
-    import motor_controller
+    import motor_controller # type: ignore
 except ImportError as e:
     print(f"ERROR: Failed to import motor_controller module: {e}")
     print("Make sure the module is compiled and the path is correct")
@@ -38,7 +38,7 @@ def test_example():
         else:
             mc.set_motor_duty_cycle(motor_id, 0.0)
         mc.update()
-        
+
     print("Motor test complete.")
 
 if __name__ == "__main__":

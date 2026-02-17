@@ -1,21 +1,16 @@
 from __future__ import annotations
 import os
 import sys
-from drivetrain import Drivetrain
 import server
 import threading
 import time
 import teleOp
 import auto
 from library.Controller import Controller
+from subsystems import drivetrain
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../library/motor_controller/build'))
-try:
-    import motor_controller as mc
-except ImportError as e:
-    print(f"ERROR: Failed to import motor_controller module: {e}")
-    print("Make sure the module is compiled and the path is correct")
-    sys.exit(1)
+import motor_controller as mc # type: ignore
 
 
 class Robot:
@@ -25,7 +20,7 @@ class Robot:
 
         # Initialize hardware
         self.motor_controller = mc.MotorController.get_instance("can0")
-        self.drivetrain = Drivetrain(self.motor_controller)
+        self.drivetrain = drivetrain.Drivetrain(self.motor_controller)
 
         # Initialize server
         self.server = server.Server()

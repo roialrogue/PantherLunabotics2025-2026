@@ -1,6 +1,6 @@
 import math
 from library.util import Util
-import motor_controller
+import motor_controller # type: ignore
 
 class Drivetrain:
 
