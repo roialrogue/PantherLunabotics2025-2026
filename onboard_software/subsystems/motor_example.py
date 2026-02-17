@@ -20,8 +20,8 @@ def test_motor_bindings():
     # Note: This may throw a CAN error if no hardware is connected, 
     # but it proves the BINDING works.
     can_bus = "can0"
-    motor_ids = [1, 2, 7, 4]
-    duties = [0.1, 0.1, 0.1, -0.2]
+    motor_ids = [6]
+    duties = [0.1]
 
     print(f"Attempting to call run_motor on {can_bus}...")
 
