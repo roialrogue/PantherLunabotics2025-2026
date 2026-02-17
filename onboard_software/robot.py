@@ -12,7 +12,6 @@ from subsystems import drivetrain
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../library/motor_controller/build'))
 import motor_controller as mc # type: ignore
 
-
 class Robot:
     def __init__(self):
         self.current_mode = None

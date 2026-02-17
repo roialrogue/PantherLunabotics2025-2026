@@ -1,10 +1,14 @@
 from __future__ import annotations
+import time
 import robot
+import robot_params
 
 
 class Auto:
+
     def __init__(self, robot: robot.Robot):
         self.robot = robot
+        self._last_update_time = time.monotonic()
 
     # Called only when there is a button event
     def on_button_event(self, button, is_pressed):
@@ -39,5 +43,16 @@ class Auto:
             else:
                 print("[AUTO] RB button released")
 
+    """Called at 50Hz — put all periodic tasks here."""
+    def periodic_loop(self):
+
+        self.robot.drivetrain.update()
+
     def run_auto_step(self):
-        pass
+
+        # Update periodic loop
+        now = time.monotonic()
+        elapsed = now - self._last_update_time
+        if elapsed >= robot_params.LoopConfig.UPDATE_PERIOD_S:
+            self.periodic_loop()
+            self._last_update_time = now

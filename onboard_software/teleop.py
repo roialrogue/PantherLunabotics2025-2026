@@ -1,10 +1,9 @@
 from __future__ import annotations
 import time
 import robot
+import robot_params
 
 class TeleOp:
-    UPDATE_RATE_HZ = 50  # Change this to adjust loop frequency
-    UPDATE_PERIOD_S = 1.0 / UPDATE_RATE_HZ  # 0.02s at 50Hz
 
     def __init__(self, robot: robot.Robot):
         self.robot = robot
@@ -55,8 +54,8 @@ class TeleOp:
             else:
                 print("[TELEOP] RB button released")
 
+    """Called at 50Hz — put all periodic tasks here."""
     def periodic_loop(self):
-        """Called at 50Hz — put all periodic tasks here."""
 
         #self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
 
@@ -67,7 +66,6 @@ class TeleOp:
         # Update periodic loop
         now = time.monotonic()
         elapsed = now - self._last_update_time
-        if elapsed >= self.UPDATE_PERIOD_S:
+        if elapsed >= robot_params.LoopConfig.UPDATE_PERIOD_S:
             self.periodic_loop()
             self._last_update_time = now
-            
