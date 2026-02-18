@@ -11,6 +11,7 @@ class Server: # Robot Server
         # AF_INET is used for IPv4 protocols
         # SOCK_STREAM is used for TCP packets
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((self.host, self.port))
         print("[Server] Socket binded to %s:%d" % (self.host, self.port))
         self.server_socket.listen(1) # Allow only 1 connection
