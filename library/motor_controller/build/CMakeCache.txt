@@ -216,11 +216,11 @@ motor_controller_BINARY_DIR:STATIC=/home/rmcnasa/PantherLunabotics2025-2026/libr
 //Value Computed by CMake
 motor_controller_IS_TOP_LEVEL:STATIC=ON
 
+//Dependencies for the target
+motor_controller_LIB_DEPENDS:STATIC=general;pthread;
+
 //Value Computed by CMake
 motor_controller_SOURCE_DIR:STATIC=/home/rmcnasa/PantherLunabotics2025-2026/library/motor_controller
-
-//The directory containing a CMake configuration file for pybind11.
-pybind11_DIR:PATH=pybind11_DIR-NOTFOUND
 
 
 ########################
@@ -358,23 +358,4 @@ CMAKE_TAPI-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
-//Details about finding Python3
-FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/home/rmcnasa/PantherLunabotics2025-2026/lunaenv/bin/python3.9][/usr/include/python3.9][/usr/lib/arm-linux-gnueabihf/libpython3.9.so][found components: Interpreter Development Development.Module Development.Embed ][v3.9.2()]
-//Compiler reason failure
-_Python3_Compiler_REASON_FAILURE:INTERNAL=
-_Python3_DEVELOPMENT_EMBED_SIGNATURE:INTERNAL=2f9d78b4715763c6707a4c3a9299def2
-_Python3_DEVELOPMENT_MODULE_SIGNATURE:INTERNAL=8e11750cd0638db522e4d39a158d2442
-//Development reason failure
-_Python3_Development_REASON_FAILURE:INTERNAL=
-//Path to a program.
-_Python3_EXECUTABLE:INTERNAL=/home/rmcnasa/PantherLunabotics2025-2026/lunaenv/bin/python3.9
-//Path to a file.
-_Python3_INCLUDE_DIR:INTERNAL=/usr/include/python3.9
-//Python3 Properties
-_Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;9;2;32;<none>;cpython-39-arm-linux-gnueabihf;abi3;/usr/lib/python3.9;/usr/lib/python3.9;/home/rmcnasa/PantherLunabotics2025-2026/lunaenv/lib/python3.9/site-packages;/home/rmcnasa/PantherLunabotics2025-2026/lunaenv/lib/python3.9/site-packages
-_Python3_INTERPRETER_SIGNATURE:INTERNAL=643cbd29f4f19b3a4481e57e3cf79c18
-//Path to a library.
-_Python3_LIBRARY_RELEASE:INTERNAL=/usr/lib/arm-linux-gnueabihf/libpython3.9.so
-//NumPy reason failure
-_Python3_NumPy_REASON_FAILURE:INTERNAL=
 
