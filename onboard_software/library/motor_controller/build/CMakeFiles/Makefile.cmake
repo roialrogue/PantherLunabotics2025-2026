@@ -7,9 +7,6 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "/home/rmcnasa/PantherLunabotics2025-2026/library/motor_controller/CMakeLists.txt"
-  "CMakeFiles/4.2.1/CMakeCXXCompiler.cmake"
-  "CMakeFiles/4.2.1/CMakeSystem.cmake"
   "/home/rmcnasa/PantherLunabotics2025-2026/lunaenv/lib/python3.9/site-packages/cmake/data/share/cmake-4.2/Modules/CMakeCXXCompiler.cmake.in"
   "/home/rmcnasa/PantherLunabotics2025-2026/lunaenv/lib/python3.9/site-packages/cmake/data/share/cmake-4.2/Modules/CMakeCXXCompilerABI.cpp"
   "/home/rmcnasa/PantherLunabotics2025-2026/lunaenv/lib/python3.9/site-packages/cmake/data/share/cmake-4.2/Modules/CMakeCXXInformation.cmake"
@@ -95,6 +92,9 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/rmcnasa/PantherLunabotics2025-2026/lunaenv/lib/python3.9/site-packages/cmake/data/share/cmake-4.2/Modules/Platform/Linux-Initialize.cmake"
   "/home/rmcnasa/PantherLunabotics2025-2026/lunaenv/lib/python3.9/site-packages/cmake/data/share/cmake-4.2/Modules/Platform/Linux.cmake"
   "/home/rmcnasa/PantherLunabotics2025-2026/lunaenv/lib/python3.9/site-packages/cmake/data/share/cmake-4.2/Modules/Platform/UnixPaths.cmake"
+  "/home/rmcnasa/PantherLunabotics2025-2026/onboard_software/library/motor_controller/CMakeLists.txt"
+  "CMakeFiles/4.2.1/CMakeCXXCompiler.cmake"
+  "CMakeFiles/4.2.1/CMakeSystem.cmake"
   )
 
 # The corresponding makefile is:

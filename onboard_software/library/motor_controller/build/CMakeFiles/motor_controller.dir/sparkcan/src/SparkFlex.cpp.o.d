@@ -1,8 +1,8 @@
 CMakeFiles/motor_controller.dir/sparkcan/src/SparkFlex.cpp.o: \
- /home/rmcnasa/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkFlex.cpp \
+ /home/rmcnasa/PantherLunabotics2025-2026/onboard_software/library/motor_controller/sparkcan/src/SparkFlex.cpp \
  /usr/include/stdc-predef.h \
- /home/rmcnasa/PantherLunabotics2025-2026/library/motor_controller/sparkcan/include/SparkFlex.hpp \
- /home/rmcnasa/PantherLunabotics2025-2026/library/motor_controller/sparkcan/include/SparkBase.hpp \
+ /home/rmcnasa/PantherLunabotics2025-2026/onboard_software/library/motor_controller/sparkcan/include/SparkFlex.hpp \
+ /home/rmcnasa/PantherLunabotics2025-2026/onboard_software/library/motor_controller/sparkcan/include/SparkBase.hpp \
  /usr/include/c++/10/array /usr/include/c++/10/utility \
  /usr/include/arm-linux-gnueabihf/c++/10/bits/c++config.h \
  /usr/include/arm-linux-gnueabihf/c++/10/bits/os_defines.h \

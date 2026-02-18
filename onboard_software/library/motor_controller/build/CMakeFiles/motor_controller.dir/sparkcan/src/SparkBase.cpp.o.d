@@ -1,7 +1,7 @@
 CMakeFiles/motor_controller.dir/sparkcan/src/SparkBase.cpp.o: \
- /home/rmcnasa/PantherLunabotics2025-2026/library/motor_controller/sparkcan/src/SparkBase.cpp \
+ /home/rmcnasa/PantherLunabotics2025-2026/onboard_software/library/motor_controller/sparkcan/src/SparkBase.cpp \
  /usr/include/stdc-predef.h \
- /home/rmcnasa/PantherLunabotics2025-2026/library/motor_controller/sparkcan/include/SparkBase.hpp \
+ /home/rmcnasa/PantherLunabotics2025-2026/onboard_software/library/motor_controller/sparkcan/include/SparkBase.hpp \
  /usr/include/c++/10/array /usr/include/c++/10/utility \
  /usr/include/arm-linux-gnueabihf/c++/10/bits/c++config.h \
  /usr/include/arm-linux-gnueabihf/c++/10/bits/os_defines.h \
