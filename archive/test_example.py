@@ -2,7 +2,7 @@ import sys
 import os
 import time
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'library/motor_controller/build'))
 import motor_controller # type: ignore
 
 def test_example():
