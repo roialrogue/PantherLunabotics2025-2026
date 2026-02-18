@@ -1,6 +1,11 @@
-import math
-from library.util import Util
+import sys
+import os
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
 import motor_controller # type: ignore
+
+from library.util import Util
+import math
 
 class Drivetrain:
 

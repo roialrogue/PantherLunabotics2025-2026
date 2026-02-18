@@ -6,11 +6,10 @@ import threading
 import time
 import teleOp
 import auto
-from library.Controller import Controller
 from subsystems import drivetrain
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../library/motor_controller/build'))
-import motor_controller as mc # type: ignore
+sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
+import motor_controller as mc  # type: ignore
 
 class Robot:
     def __init__(self):
@@ -26,7 +25,7 @@ class Robot:
         threading.Thread(target=self.server.start).start()
 
         # Initialize controller and run modes
-        self.controller = Controller(self)
+        self.controller = controller.Controller(self)
         self.teleop = teleOp.TeleOp(self)
         self.auto = auto.Auto(self)
 

@@ -1,8 +1,10 @@
 from __future__ import annotations
 import time
-import robot
 import robot_params
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    import robot
 
 class Auto:
 
