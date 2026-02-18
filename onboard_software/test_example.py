@@ -2,13 +2,8 @@ import sys
 import os
 import time
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../library/motor_controller/build'))
-try:
-    import motor_controller # type: ignore
-except ImportError as e:
-    print(f"ERROR: Failed to import motor_controller module: {e}")
-    print("Make sure the module is compiled and the path is correct")
-    sys.exit(1)
+sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
+import motor_controller # type: ignore
 
 def test_example():
     

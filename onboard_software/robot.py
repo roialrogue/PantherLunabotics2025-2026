@@ -7,6 +7,7 @@ import time
 import teleOp
 import auto
 from subsystems import drivetrain
+from library import controller
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
 import motor_controller as mc  # type: ignore
