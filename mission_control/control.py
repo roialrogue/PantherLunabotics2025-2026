@@ -142,5 +142,5 @@ class Control:
         self.client.stop()
 
 if __name__ == "__main__":
-    server_ip = "localhost"  # Robot IP address: 100.67.49.108
+    server_ip = "100.76.221.110"  # RP IP = "100.76.221.110"
     Control(server_ip).run()

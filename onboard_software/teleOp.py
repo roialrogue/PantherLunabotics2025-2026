@@ -59,11 +59,11 @@ class TeleOp:
 
     """Called at 50Hz — put all periodic tasks here."""
     def periodic_loop(self):
-
-        #self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
+        pass
 
         #self.robot.drivetrain.set_power(0.1, 0.1, 0.1, 0.1)
-        self.robot.drivetrain.update()
+
+        #self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
 
     def run_teleOp_step(self):
 
