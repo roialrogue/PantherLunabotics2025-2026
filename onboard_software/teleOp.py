@@ -45,7 +45,8 @@ class TeleOp:
         elif button == 'LB':
             if is_pressed:
                 #Strafe left
-                self.robot.drivetrain.set_power(0.5,-0.5,-0.5,0.5)
+                self.robot.drivetrain.set_power(0.0,0.0,0.0,0.0)
+                #self.robot.drivetrain.set_power(0.5,-0.5,-0.5,0.5)
                 print("[TELEOP] LB button pressed")
             else:
                 print("[TELEOP] LB button released")
