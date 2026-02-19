@@ -64,7 +64,7 @@ class TeleOp:
         #self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
         
         # Update motor controller
-        robot.mc.update()
+        self.robot.motor_controller.update()
 
     def run_teleOp_step(self):
 
