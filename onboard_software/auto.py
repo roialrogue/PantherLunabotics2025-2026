@@ -48,7 +48,8 @@ class Auto:
     """Called at 50Hz — put all periodic tasks here."""
     def periodic_loop(self):
 
-        self.robot.drivetrain.update()
+        # Update motor controller
+        robot.mc.update()
 
     def run_auto_step(self):
 

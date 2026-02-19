@@ -25,12 +25,12 @@ struct MotorConfig
     IdleMode idleMode = IdleMode::kBrake;
     MotorType motorType = MotorType::kBrushless;
     SensorType sensorType = SensorType::kHallSensor;
-    float rampRate = 0.1;
+    float rampRate = 0.0;
     bool inverted = false;
-    int motorKv = 565;                  // NEO Vortex default
-    int encoderCountsPerRev = 7168;     // NEO Vortex default
+    int motorKv = 480;
+    int encoderCountsPerRev = 4096;
     float smartCurrentFreeLimit = 20.0;
-    float smartCurrentStallLimit = 20.0;
+    float smartCurrentStallLimit = 80.0;
 };
 
 class MotorController 

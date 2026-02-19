@@ -16,6 +16,7 @@ class Drivetrain:
         self.mc = mc
         self.motor_ids = [6, 2, 3, 4] #Order: front right, front left, back right, back left
 
+        # This config is the same as default so techonically it is not needed.
         config = motor_controller.MotorConfig()
         config.idle_mode = motor_controller.IdleMode.BRAKE
         config.motor_type = motor_controller.MotorType.BRUSHLESS
@@ -36,6 +37,7 @@ class Drivetrain:
         self.max_speed = max_speed
 
     def set_power(self, front_right_power, front_left_power, back_right_power, back_left_power):
+        print("setting power")
         self.mc.set_motor_duty_cycle(self.motor_ids[0], Util.clip(front_right_power, -self.max_speed, self.max_speed))
         self.mc.set_motor_duty_cycle(self.motor_ids[1], Util.clip(front_left_power, -self.max_speed, self.max_speed))
         self.mc.set_motor_duty_cycle(self.motor_ids[2], Util.clip(back_right_power, -self.max_speed, self.max_speed))
