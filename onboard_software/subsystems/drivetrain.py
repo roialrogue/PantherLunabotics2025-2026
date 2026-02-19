@@ -14,7 +14,7 @@ class Drivetrain:
         self.max_speed = 0.1
 
         self.mc = mc
-        self.motor_ids = [6, 2, 3, 4] #Order: front right, front left, back right, back left
+        self.motor_ids = [2, 7, 4, 5] #Order: front right, front left, back right, back left
 
         # This config is the same as default so techonically it is not needed.
         config = motor_controller.MotorConfig()
