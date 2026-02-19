@@ -11,10 +11,10 @@ class Drivetrain:
 
     def __init__(self, mc):
         self.slow_turning = True
-        self.max_speed = 0.1
+        self.max_speed = 0.3
 
         self.mc = mc
-        self.motor_ids = [2, 7, 4, 5] #Order: front right, front left, back right, back left
+        self.motor_ids = [2, 7, 4, 1] #Order: front right, front left, back right, back left
 
         # This config is the same as default so techonically it is not needed.
         config = motor_controller.MotorConfig()
