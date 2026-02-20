@@ -23,7 +23,7 @@ class Drivetrain:
         config.motor_type = motor_controller.MotorType.BRUSHLESS
         config.sensor_type = motor_controller.SensorType.HALL_SENSOR
         config.ramp_rate = 0.0
-        config.inverted = True
+        config.inverted = False
         config.motor_kv = 480
         config.encoder_counts_per_rev = 4096
         config.smart_current_free_limit = 20.0
