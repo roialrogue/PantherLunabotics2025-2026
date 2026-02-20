@@ -17,7 +17,7 @@ class TeleOp:
         if button == 'A':
             if is_pressed:
                 #All postive power
-                self.robot.drivetrain.set_power(0.5,0.5,0.5,0.5)
+                self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
                 print("[TELEOP] A button pressed")
             else:
                 print("[TELEOP] A button released")
