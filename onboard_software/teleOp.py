@@ -56,6 +56,26 @@ class TeleOp:
                 print("[TELEOP] RB button pressed")
             else:
                 print("[TELEOP] RB button released")
+        elif button == 'DPAD_UP':
+            if is_pressed:
+                print("[TELEOP] DPAD_UP pressed")
+            else:
+                print("[TELEOP] DPAD_UP released")
+        elif button == 'DPAD_DOWN':
+            if is_pressed:
+                print("[TELEOP] DPAD_DOWN pressed")
+            else:
+                print("[TELEOP] DPAD_DOWN released")
+        elif button == 'DPAD_LEFT':
+            if is_pressed:
+                print("[TELEOP] DPAD_LEFT pressed")
+            else:
+                print("[TELEOP] DPAD_LEFT released")
+        elif button == 'DPAD_RIGHT':
+            if is_pressed:
+                print("[TELEOP] DPAD_RIGHT pressed")
+            else:
+                print("[TELEOP] DPAD_RIGHT released")
 
     """Called at 50Hz — put all periodic tasks here."""
     def periodic_loop(self):

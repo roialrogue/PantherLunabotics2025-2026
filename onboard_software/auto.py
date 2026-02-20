@@ -44,6 +44,26 @@ class Auto:
                 print("[AUTO] RB button pressed")
             else:
                 print("[AUTO] RB button released")
+        elif button == 'DPAD_UP':
+            if is_pressed:
+                print("[AUTO] DPAD_UP pressed")
+            else:
+                print("[AUTO] DPAD_UP released")
+        elif button == 'DPAD_DOWN':
+            if is_pressed:
+                print("[AUTO] DPAD_DOWN pressed")
+            else:
+                print("[AUTO] DPAD_DOWN released")
+        elif button == 'DPAD_LEFT':
+            if is_pressed:
+                print("[AUTO] DPAD_LEFT pressed")
+            else:
+                print("[AUTO] DPAD_LEFT released")
+        elif button == 'DPAD_RIGHT':
+            if is_pressed:
+                print("[AUTO] DPAD_RIGHT pressed")
+            else:
+                print("[AUTO] DPAD_RIGHT released")
 
     """Called at 50Hz — put all periodic tasks here."""
     def periodic_loop(self):
