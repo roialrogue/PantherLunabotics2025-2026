@@ -14,10 +14,11 @@ class Drivetrain:
         self.max_speed = 0.2
 
         self.mc = mc
-        self.motor_ids = [2, 7, 4, 1] #Order: front right, front left, back right, back left
+        self.left_motor_ids = [7, 1] #Order: front left, back left
+        self.right_motor_ids = [4, 2] #back right, back left
 
         # This config is the same as default so techonically it is not needed.
-        config = motor_controller.MotorConfig()
+        config = motor_controller.MotorConfig() # left side motors
         config.idle_mode = motor_controller.IdleMode.BRAKE
         config.motor_type = motor_controller.MotorType.BRUSHLESS
         config.sensor_type = motor_controller.SensorType.HALL_SENSOR
@@ -28,7 +29,19 @@ class Drivetrain:
         config.smart_current_free_limit = 20.0
         config.smart_current_stall_limit = 80.0
 
-        self.mc.initialize_motors(self.motor_ids, config)
+        config = motor_controller.MotorConfig() # left right motors
+        config.idle_mode = motor_controller.IdleMode.BRAKE
+        config.motor_type = motor_controller.MotorType.BRUSHLESS
+        config.sensor_type = motor_controller.SensorType.HALL_SENSOR
+        config.ramp_rate = 0.0
+        config.inverted = True
+        config.motor_kv = 480
+        config.encoder_counts_per_rev = 4096
+        config.smart_current_free_limit = 20.0
+        config.smart_current_stall_limit = 80.0
+
+        self.mc.initialize_motors(self.left_motor_ids, config)
+        self.mc.initialize_motors(self.right_motor_ids, config)
 
     def set_slow_turning(self, slow_turning):
         self.slow_turning = slow_turning
@@ -38,10 +51,10 @@ class Drivetrain:
 
     def set_power(self, front_right_power, front_left_power, back_right_power, back_left_power):
         print("setting power")
-        self.mc.set_motor_duty_cycle(self.motor_ids[0], Util.clip(front_right_power, -self.max_speed, self.max_speed))
-        self.mc.set_motor_duty_cycle(self.motor_ids[1], Util.clip(front_left_power, -self.max_speed, self.max_speed))
-        self.mc.set_motor_duty_cycle(self.motor_ids[2], Util.clip(back_right_power, -self.max_speed, self.max_speed))
-        self.mc.set_motor_duty_cycle(self.motor_ids[3], Util.clip(back_left_power, -self.max_speed, self.max_speed))
+        self.mc.set_motor_duty_cycle(self.right_motor_ids[0], Util.clip(front_right_power, -self.max_speed, self.max_speed))
+        self.mc.set_motor_duty_cycle(self.left_motor_ids[0], Util.clip(front_left_power, -self.max_speed, self.max_speed))
+        self.mc.set_motor_duty_cycle(self.right_motor_ids[1], Util.clip(back_right_power, -self.max_speed, self.max_speed))
+        self.mc.set_motor_duty_cycle(self.left_motor_ids[1], Util.clip(back_left_power, -self.max_speed, self.max_speed))
 
     def drive_task(self, y_axis, x_axis, turning_axis):
         y = -(math.atan(5 * y_axis) / math.atan(5))
