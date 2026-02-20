@@ -52,7 +52,7 @@ class TeleOp:
         elif button == 'RB':
             if is_pressed:
                 #Turn right
-                self.robot.drivetrain.set_power(0.5,-0.5,-0.5,0.5)
+                self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
                 print("[TELEOP] RB button pressed")
             else:
                 print("[TELEOP] RB button released")
