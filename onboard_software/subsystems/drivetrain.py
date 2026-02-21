@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
 import motor_controller # type: ignore
@@ -12,6 +13,7 @@ class Drivetrain:
     def __init__(self, mc):
         self.slow_turning = True
         self.max_speed = 0.2
+        self._last_telemetry_time = 0.0
 
         self.mc = mc
         self.left_motor_ids = [7, 1] #Order: front left, back left
@@ -74,3 +76,28 @@ class Drivetrain:
 
     def stop(self):
         self.set_power(0, 0, 0, 0)
+
+    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, interval=0.1):
+        now = time.monotonic()
+        if now - self._last_telemetry_time < interval:
+            return
+        self._last_telemetry_time = now
+
+        motors = [
+            ("FL", self.left_motor_ids[0]),
+            ("BL", self.left_motor_ids[1]),
+            ("FR", self.right_motor_ids[0]),
+            ("BR", self.right_motor_ids[1]),
+        ]
+
+        for label, motor_id in motors:
+            feedback = self.mc.get_motor_feedback(motor_id)
+            parts = []
+            if duty_cycle:
+                parts.append(f"Duty Cycle: {feedback.duty_cycle:.4f}")
+            if velocity:
+                parts.append(f"Velocity: {feedback.velocity:.2f} RPM")
+            if position:
+                parts.append(f"Position: {feedback.position:.1f} ticks")
+            if parts:
+                print(f"[Drivetrain {label}] " + ", ".join(parts))
