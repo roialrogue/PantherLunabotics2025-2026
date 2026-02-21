@@ -7,6 +7,7 @@ import time
 import teleOp
 import auto
 from subsystems import drivetrain
+from subsystems import auger
 from library import controller
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
@@ -20,6 +21,7 @@ class Robot:
         # Initialize hardware
         self.motor_controller = mc.MotorController.get_instance("can0")
         self.drivetrain = drivetrain.Drivetrain(self.motor_controller)
+        self.auger = auger.Auger(self.motor_controller)
 
         # Initialize server
         self.server = server.Server()
@@ -60,6 +62,7 @@ class Robot:
         self.running = False
         self.server.stop()
         self.drivetrain.stop()
+        self.auger.stop()
         
 if __name__ == "__main__":
     Robot().run()
