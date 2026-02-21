@@ -1,0 +1,182 @@
+"""
+motor_config_test.py
+Standalone motor configuration test — Motor ID 6.
+
+Modify the CONFIG and TEST SEQUENCE sections below, then run this
+script directly.  All telemetry is printed to stdout so you can
+watch how config changes affect real motor behaviour.
+"""
+
+from __future__ import annotations
+import os
+import sys
+import time
+import signal
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
+import motor_controller as mc  # type: ignore
+
+# ==============================================================
+# CONFIG — tweak these values to test different settings
+# ==============================================================
+
+MOTOR_ID = 6
+
+# IdleMode.BRAKE  → motor actively resists movement when idle
+# IdleMode.COAST  → motor freewheels when idle
+IDLE_MODE = mc.IdleMode.BRAKE
+
+# MotorType.BRUSHLESS or MotorType.BRUSHED
+MOTOR_TYPE = mc.MotorType.BRUSHLESS
+
+# SensorType.HALL_SENSOR (add others if your build exposes them)
+SENSOR_TYPE = mc.SensorType.HALL_SENSOR
+
+# How fast the controller ramps output (0.0 = instant, higher = slower)
+RAMP_RATE = 0.0
+
+# Flip the direction of positive power
+INVERTED = False
+
+# KV rating of the motor (RPM per volt)
+MOTOR_KV = 480
+
+# Encoder ticks per full mechanical revolution
+ENCODER_COUNTS_PER_REV = 4096
+
+# Current limits (amps)
+SMART_CURRENT_FREE_LIMIT  = 20.0
+SMART_CURRENT_STALL_LIMIT = 80.0
+
+# ==============================================================
+# TEST SEQUENCE — list of (power, hold_seconds) tuples
+# power is in [-1.0, 1.0]; adjust steps to suit your needs
+# ==============================================================
+
+TEST_STEPS: list[tuple[float, float]] = [
+    ( 0.00, 1.0),   # start at neutral — confirm zero output
+    ( 0.3, 3.0),   # light forward
+    ( 0.00, 2.0),   # back to neutral — watch idle mode behaviour
+    (-0.3, 3.0),   # light reverse
+    ( 0.00, 2.0),   # final stop
+]
+
+# How often telemetry is printed (seconds)
+TELEMETRY_INTERVAL = 0.1
+
+
+# ==============================================================
+# Test class
+# ==============================================================
+
+class MotorConfigTest:
+
+    def __init__(self) -> None:
+        self.motor_id = MOTOR_ID
+        self._setpoint = 0.0
+        self._running = True
+
+        # Graceful shutdown on Ctrl-C
+        signal.signal(signal.SIGINT, self._on_sigint)
+
+        # Connect to CAN bus
+        self.mc = mc.MotorController.get_instance("can0")
+
+        # Build and apply config
+        config = mc.MotorConfig()
+        config.idle_mode               = IDLE_MODE
+        config.motor_type              = MOTOR_TYPE
+        config.sensor_type             = SENSOR_TYPE
+        config.ramp_rate               = RAMP_RATE
+        config.inverted                = INVERTED
+        config.motor_kv                = MOTOR_KV
+        config.encoder_counts_per_rev  = ENCODER_COUNTS_PER_REV
+        config.smart_current_free_limit  = SMART_CURRENT_FREE_LIMIT
+        config.smart_current_stall_limit = SMART_CURRENT_STALL_LIMIT
+
+        self.mc.initialize_motor(self.motor_id, config)
+        self._print_config()
+
+    # ----------------------------------------------------------
+    # Internal helpers
+    # ----------------------------------------------------------
+
+    def _on_sigint(self, sig, frame) -> None:
+        print("\n\n[Test] Ctrl-C received — stopping motor.")
+        self._running = False
+        self.mc.set_motor_duty_cycle(self.motor_id, 0.0)
+        sys.exit(0)
+
+    def _print_config(self) -> None:
+        sep = "=" * 58
+        print(sep)
+        print(f"  MOTOR CONFIG TEST   |   Motor ID: {self.motor_id}")
+        print(sep)
+        print(f"  Idle Mode           : {IDLE_MODE}")
+        print(f"  Motor Type          : {MOTOR_TYPE}")
+        print(f"  Sensor Type         : {SENSOR_TYPE}")
+        print(f"  Ramp Rate           : {RAMP_RATE}")
+        print(f"  Inverted            : {INVERTED}")
+        print(f"  Motor KV            : {MOTOR_KV} KV")
+        print(f"  Encoder CPR         : {ENCODER_COUNTS_PER_REV} ticks/rev")
+        print(f"  Current Free Limit  : {SMART_CURRENT_FREE_LIMIT} A")
+        print(f"  Current Stall Limit : {SMART_CURRENT_STALL_LIMIT} A")
+        print(sep)
+
+    def _print_telemetry(self) -> None:
+        try:
+            fb = self.mc.get_motor_feedback(self.motor_id)
+            print(
+                f"[M{self.motor_id}] "
+                f"Set: {self._setpoint:+.3f}  |  "
+                f"Duty: {fb.duty_cycle:+.4f}  |  "
+                f"Vel: {fb.velocity:8.2f} RPM  |  "
+                f"Pos: {fb.position:10.1f} ticks  |  "
+                f"Curr: {fb.current:5.2f} A  |  "
+                f"Temp: {fb.temperature:5.1f} °C  |  "
+                f"Bus: {fb.voltage:5.2f} V"
+            )
+        except Exception as exc:
+            print(f"[M{self.motor_id}] Telemetry error: {exc}")
+
+    # ----------------------------------------------------------
+    # Public interface
+    # ----------------------------------------------------------
+
+    def set_power(self, power: float) -> None:
+        self._setpoint = power
+        self.mc.set_motor_duty_cycle(self.motor_id, power)
+
+    def stop(self) -> None:
+        self.set_power(0.0)
+
+    def run(self) -> None:
+        print("\n[Test] Starting sequence. Press Ctrl-C to abort.\n")
+
+        for step_num, (power, duration) in enumerate(TEST_STEPS, start=1):
+            if not self._running:
+                break
+
+            print(f"\n--- Step {step_num}/{len(TEST_STEPS)}: "
+                  f"power={power:+.2f}  hold={duration:.1f}s ---")
+            self.set_power(power)
+
+            elapsed = 0.0
+            while elapsed < duration and self._running:
+                self._print_telemetry()
+                time.sleep(TELEMETRY_INTERVAL)
+                elapsed += TELEMETRY_INTERVAL
+
+        # Always end at zero
+        print("\n[Test] Sequence complete — stopping motor.")
+        self.stop()
+
+        # One final snapshot after the motor settles
+        time.sleep(0.3)
+        print("\n--- Final telemetry (motor stopped) ---")
+        self._print_telemetry()
+        print("\n[Test] Done.")
+
+
+if __name__ == "__main__":
+    MotorConfigTest().run()

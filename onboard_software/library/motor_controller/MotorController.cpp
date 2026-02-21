@@ -12,11 +12,14 @@
 namespace py = pybind11;
 
 // Feedback structure with all three output data types
-struct MotorFeedback 
+struct MotorFeedback
 {
     float dutyCycle;     // Percentage of max output (-1.0 to 1.0)
     float velocity;      // RPM
     float position;      // ticks
+    float current;       // Amps
+    float temperature;   // Degrees Celsius
+    float voltage;       // Bus voltage (Volts)
 };
 
 // Configuration structure for motor initialization
@@ -147,9 +150,12 @@ public:
 
             // Collect and cache feedback
             MotorFeedback data;
-            data.dutyCycle = motor.GetDutyCycle();
-            data.velocity = motor.GetVelocity();
-            data.position = motor.GetPosition();
+            data.dutyCycle    = motor.GetDutyCycle();
+            data.velocity     = motor.GetVelocity();
+            data.position     = motor.GetPosition();
+            data.current      = motor.GetCurrent();
+            data.temperature  = motor.GetTemperature();
+            data.voltage      = motor.GetVoltage();
 
             motorFeedback[motor_ID] = data;
         }
@@ -238,13 +244,19 @@ PYBIND11_MODULE(motor_controller, m)
     // Bind MotorFeedback structure
     py::class_<MotorFeedback>(m, "MotorFeedback")
         .def(py::init<>())
-        .def_readwrite("duty_cycle", &MotorFeedback::dutyCycle)
-        .def_readwrite("velocity", &MotorFeedback::velocity)
-        .def_readwrite("position", &MotorFeedback::position)
+        .def_readwrite("duty_cycle",   &MotorFeedback::dutyCycle)
+        .def_readwrite("velocity",     &MotorFeedback::velocity)
+        .def_readwrite("position",     &MotorFeedback::position)
+        .def_readwrite("current",      &MotorFeedback::current)
+        .def_readwrite("temperature",  &MotorFeedback::temperature)
+        .def_readwrite("voltage",      &MotorFeedback::voltage)
         .def("__repr__", [](const MotorFeedback &fb) {
             return "MotorFeedback(duty_cycle=" + std::to_string(fb.dutyCycle) +
                    ", velocity=" + std::to_string(fb.velocity) + " RPM" +
-                   ", position=" + std::to_string(fb.position) + " ticks)";
+                   ", position=" + std::to_string(fb.position) + " ticks" +
+                   ", current=" + std::to_string(fb.current) + " A" +
+                   ", temperature=" + std::to_string(fb.temperature) + " C" +
+                   ", voltage=" + std::to_string(fb.voltage) + " V)";
         });
 
     // Bind MotorConfig structure

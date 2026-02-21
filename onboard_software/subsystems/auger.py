@@ -37,7 +37,7 @@ class Auger:
     def stop(self):
         self.set_power(0.0)
 
-    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, interval=0.1):
+    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=True, voltage=True, interval=0.1):
         now = time.monotonic()
         if now - self._last_telemetry_time < interval:
             return
@@ -52,6 +52,12 @@ class Auger:
             parts.append(f"Velocity: {feedback.velocity:.2f} RPM")
         if position:
             parts.append(f"Position: {feedback.position:.1f} ticks")
+        if current:
+            parts.append(f"Current: {feedback.current:.2f} A")
+        if temperature:
+            parts.append(f"Temp: {feedback.temperature:.1f} °C")
+        if voltage:
+            parts.append(f"Bus: {feedback.voltage:.2f} V")
 
         if not parts:
             return
