@@ -9,7 +9,7 @@ class Auger:
 
     def __init__(self, mc):
         self.mc = mc
-        self.motor_id = 1
+        self.motor_id = 3
         self._last_telemetry_time = 0.0
 
         config = motor_controller.MotorConfig()
