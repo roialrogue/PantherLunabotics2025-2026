@@ -90,7 +90,10 @@ class TeleOp:
         #self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
         
         # Update motor controller
-        self.robot.motor_controller.update()
+        try:
+            self.robot.motor_controller.update()
+        except RuntimeError as e:
+            print(f"[TeleOp] CAN error: {e}")
 
     def run_teleOp_step(self):
 
