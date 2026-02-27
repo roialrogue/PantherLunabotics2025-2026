@@ -37,22 +37,22 @@ class TeleOp:
                 print("[TELEOP] X button released")
         elif button == 'Y':
             if is_pressed:
-                #Forward
+                #backward
                 self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
                 print("[TELEOP] Y button pressed")
             else:
                 print("[TELEOP] Y button released")
         elif button == 'LB':
             if is_pressed:
-                #Strafe left
-                self.robot.drivetrain.set_power(0.0,0.0,0.0,0.0)
+                #Turn left
+                self.robot.drivetrain.set_power(-0.5,-0.5,-0.5,-0.5)
                 print("[TELEOP] LB button pressed")
             else:
                 print("[TELEOP] LB button released")
         elif button == 'RB':
             if is_pressed:
                 #Turn right
-                self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
+                self.robot.drivetrain.set_power(0.5,0.5,0.5,0.5)
                 print("[TELEOP] RB button pressed")
             else:
                 print("[TELEOP] RB button released")
@@ -72,6 +72,8 @@ class TeleOp:
                 print("[TELEOP] DPAD_DOWN released")
         elif button == 'DPAD_LEFT':
             if is_pressed:
+                #Off
+                self.robot.drivetrain.set_power(0.0,0.0,0.0,0.0)
                 print("[TELEOP] DPAD_LEFT pressed")
             else:
                 print("[TELEOP] DPAD_LEFT released")
