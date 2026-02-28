@@ -24,10 +24,10 @@ MOTOR_ID = 6
 
 # IdleMode.BRAKE  → motor actively resists movement when idle
 # IdleMode.COAST  → motor freewheels when idle
-IDLE_MODE = mc.IdleMode.COAST
+IDLE_MODE = mc.IdleMode.BRAKE
 
 # MotorType.BRUSHLESS or MotorType.BRUSHED
-MOTOR_TYPE = mc.MotorType.BRUSHLESS
+MOTOR_TYPE = mc.MotorType.BRUSHED
 
 # SensorType.HALL_SENSOR (add others if your build exposes them)
 SENSOR_TYPE = mc.SensorType.HALL_SENSOR
