@@ -95,6 +95,11 @@ class MotorConfigTest:
         config.smart_current_stall_limit = SMART_CURRENT_STALL_LIMIT
 
         self.mc.initialize_motor(self.motor_id, config)
+
+        # BurnFlash causes the SPARK MAX to reboot — wait for it to come back online
+        print("[Init] Waiting for SPARK MAX to reboot after BurnFlash...")
+        time.sleep(3.0)
+
         self._verify_config(config)
 
     # ----------------------------------------------------------
