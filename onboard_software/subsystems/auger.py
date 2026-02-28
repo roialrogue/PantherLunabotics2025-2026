@@ -1,6 +1,7 @@
 import sys
 import os
 import time
+import robot_params
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
 import motor_controller # type: ignore
@@ -62,4 +63,4 @@ class Auger:
         if not parts:
             return
 
-        print("[Auger] " + ", ".join(parts))
+        print(f"{robot_params.robot_timer.timestamp()} [Auger] " + ", ".join(parts))

@@ -1,12 +1,12 @@
 import sys
 import os
 import time
+from library.util import Util
+import robot_params
+import math
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
 import motor_controller # type: ignore
-
-from library.util import Util
-import math
 
 class Drivetrain:
 
@@ -106,4 +106,4 @@ class Drivetrain:
             if voltage:
                 parts.append(f"Bus: {feedback.voltage:.2f} V")
             if parts:
-                print(f"[Drivetrain {label}] " + ", ".join(parts))
+                print(f"{robot_params.robot_timer.timestamp()} [Drivetrain {label}] " + ", ".join(parts))

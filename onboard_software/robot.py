@@ -9,6 +9,7 @@ import auto
 from subsystems import drivetrain
 from subsystems import auger
 from library import controller
+import robot_params
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
 import motor_controller as mc  # type: ignore
@@ -17,6 +18,9 @@ class Robot:
     def __init__(self):
         self.current_mode = None
         self.running = True
+
+        # Initialize global timer
+        robot_params.robot_timer = robot_params.RobotTimer()
 
         # Initialize hardware
         self.motor_controller = mc.MotorController.get_instance("can0")
@@ -34,6 +38,7 @@ class Robot:
 
         while self.server.get_command() != "READY":
             time.sleep(0.1)
+        robot_params.robot_timer.start()
         print("[Robot] Startup complete!")
 
     def print_telemetry(self, data):
