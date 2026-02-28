@@ -15,6 +15,8 @@ import signal
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'library/motor_controller/build'))
 import motor_controller as mc  # type: ignore
+sys.path.append(os.path.join(os.path.dirname(__file__), 'library'))
+from telemetry_logger import TelemetryLogger # type: ignore
 
 # ==============================================================
 # CONFIG — tweak these values to test different settings
@@ -55,9 +57,9 @@ SMART_CURRENT_STALL_LIMIT = 80.0
 
 TEST_STEPS: list[tuple[float, float]] = [
     ( 0.00, 0.5),   # start at neutral — confirm zero output
-    ( 0.1, 20.0),   # light forward
+    ( 0.1, 2.0),   # light forward
     ( 0.00, 1.0),   # back to neutral — watch idle mode behaviour
-    (-0.2, 20.0),   # light reverse
+    (-0.2, 2.0),   # light reverse
     ( 0.00, 0.5),   # final stop
 ]
 
@@ -75,6 +77,10 @@ class MotorConfigTest:
         self.motor_id = MOTOR_ID
         self._setpoint = 0.0
         self._running = True
+        self._run_start = 0.0
+
+        # Telemetry logger
+        self._logger = TelemetryLogger(f"motor_{MOTOR_ID}")
 
         # Graceful shutdown on Ctrl-C
         signal.signal(signal.SIGINT, self._on_sigint)
@@ -114,6 +120,7 @@ class MotorConfigTest:
         print("\n\n[Test] Ctrl-C received — stopping motor.")
         self._running = False
         self.mc.set_motor_duty_cycle(self.motor_id, 0.0)
+        self._logger.stop_logging()
         sys.exit(0)
 
     def _verify_config(self, intended: mc.MotorConfig) -> None:
@@ -200,6 +207,19 @@ class MotorConfigTest:
                 f"Temp: {fb.temperature:5.1f} °C  |  "
                 f"Bus: {fb.voltage:5.2f} V"
             )
+            if self._logger.is_logging:
+                elapsed = time.monotonic() - self._run_start
+                mins, secs = divmod(elapsed, 60)
+                ts = f"[T+{int(mins):02d}:{secs:05.2f}]"
+                self._logger.log_row(ts, [
+                    f"{self._setpoint:+.3f}",
+                    f"{fb.duty_cycle:+.4f}",
+                    f"{fb.velocity:.2f}",
+                    f"{fb.position:.1f}",
+                    f"{fb.current:.2f}",
+                    f"{fb.temperature:.1f}",
+                    f"{fb.voltage:.2f}",
+                ])
         except Exception as exc:
             print(f"[M{self.motor_id}] Telemetry error: {exc}")
 
@@ -216,6 +236,17 @@ class MotorConfigTest:
 
     def run(self) -> None:
         print("\n[Test] Starting sequence. Press Ctrl-C to abort.\n")
+
+        self._run_start = time.monotonic()
+        self._logger.start_logging([
+            "Setpoint",
+            "Duty Cycle",
+            "Velocity (RPM)",
+            "Position (ticks)",
+            "Current (A)",
+            "Temperature (°C)",
+            "Bus Voltage (V)",
+        ])
 
         for step_num, (power, duration) in enumerate(TEST_STEPS, start=1):
             if not self._running:
@@ -240,6 +271,8 @@ class MotorConfigTest:
         time.sleep(0.3)
         print("\n--- Final telemetry (motor stopped) ---")
         self._print_telemetry()
+
+        self._logger.stop_logging()
         print("\n[Test] Done.")
 
 
