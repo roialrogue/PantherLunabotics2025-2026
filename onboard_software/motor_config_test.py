@@ -24,7 +24,7 @@ MOTOR_ID = 6
 
 # IdleMode.BRAKE  → motor actively resists movement when idle
 # IdleMode.COAST  → motor freewheels when idle
-IDLE_MODE = mc.IdleMode.BRAKE
+IDLE_MODE = mc.IdleMode.COAST
 
 # MotorType.BRUSHLESS or MotorType.BRUSHED
 MOTOR_TYPE = mc.MotorType.BRUSHLESS
@@ -39,7 +39,7 @@ RAMP_RATE = 0.0
 INVERTED = False
 
 # KV rating of the motor (RPM per volt)
-MOTOR_KV = 480
+MOTOR_KV = 473
 
 # Encoder ticks per full mechanical revolution
 ENCODER_COUNTS_PER_REV = 4096
@@ -55,9 +55,9 @@ SMART_CURRENT_STALL_LIMIT = 80.0
 
 TEST_STEPS: list[tuple[float, float]] = [
     ( 0.00, 0.5),   # start at neutral — confirm zero output
-    ( 0.1, 3.0),   # light forward
+    ( 0.1, 2.0),   # light forward
     ( 0.00, 1.0),   # back to neutral — watch idle mode behaviour
-    (-0.2, 3.0),   # light reverse
+    (-0.2, 2.0),   # light reverse
     ( 0.00, 0.5),   # final stop
 ]
 
