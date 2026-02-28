@@ -98,7 +98,7 @@ class MotorConfigTest:
 
         # BurnFlash causes the SPARK MAX to reboot — wait for it to come back online
         print("[Init] Waiting for SPARK MAX to reboot after BurnFlash...")
-        time.sleep(6.0)
+        time.sleep(4.0)
 
         self._verify_config(config)
 
