@@ -30,7 +30,7 @@ IDLE_MODE = mc.IdleMode.BRAKE
 MOTOR_TYPE = mc.MotorType.BRUSHLESS
 
 # SensorType.HALL_SENSOR (add others if your build exposes them)
-SENSOR_TYPE = mc.SensorType.NO_SENSOR
+SENSOR_TYPE = mc.SensorType.HALL_SENSOR
 
 # How fast the controller ramps output (0.0 = instant, higher = slower)
 RAMP_RATE = 0.0
