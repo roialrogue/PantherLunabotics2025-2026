@@ -55,14 +55,14 @@ SMART_CURRENT_STALL_LIMIT = 80.0
 
 TEST_STEPS: list[tuple[float, float]] = [
     ( 0.00, 1.0),   # start at neutral — confirm zero output
-    ( 0.3, 3.0),   # light forward
+    ( 0.1, 3.0),   # light forward
     ( 0.00, 2.0),   # back to neutral — watch idle mode behaviour
-    (-0.3, 3.0),   # light reverse
+    (-0.1, 3.0),   # light reverse
     ( 0.00, 2.0),   # final stop
 ]
 
 # How often telemetry is printed (seconds)
-TELEMETRY_INTERVAL = 0.1
+TELEMETRY_INTERVAL = 0.05
 
 
 # ==============================================================
