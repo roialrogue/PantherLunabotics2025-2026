@@ -23,5 +23,11 @@ python robot.py
 python control.py
 ```
 
+## Start venv on onboard server
+
+```bash
+source lunaenv/bin/activate
+```
+
 ## TODO:
 

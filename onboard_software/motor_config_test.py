@@ -208,6 +208,7 @@ class MotorConfigTest:
 
             elapsed = 0.0
             while elapsed < duration and self._running:
+                self.mc.update()
                 self._print_telemetry()
                 time.sleep(TELEMETRY_INTERVAL)
                 elapsed += TELEMETRY_INTERVAL
