@@ -39,10 +39,10 @@ RAMP_RATE = 0.0
 INVERTED = False
 
 # KV rating of the motor (RPM per volt)
-MOTOR_KV = 473
+MOTOR_KV = 1
 
 # Encoder ticks per full mechanical revolution
-ENCODER_COUNTS_PER_REV = 0
+ENCODER_COUNTS_PER_REV = 1
 
 # Current limits (amps)
 SMART_CURRENT_FREE_LIMIT  = 20.0
