@@ -44,7 +44,7 @@ INVERTED = False
 MOTOR_KV = 473
 
 # Encoder ticks per full mechanical revolution
-ENCODER_COUNTS_PER_REV = 42
+ENCODER_COUNTS_PER_REV = 43
 
 # Current limits (amps)
 SMART_CURRENT_FREE_LIMIT  = 20.0
@@ -57,9 +57,9 @@ SMART_CURRENT_STALL_LIMIT = 80.0
 
 TEST_STEPS: list[tuple[float, float]] = [
     ( 0.00, 0.5),   # start at neutral — confirm zero output
-    ( 0.02, 2.0),   # light forward
+    ( 0.01, 2.0),   # light forward
     ( 0.00, 1.0),   # back to neutral — watch idle mode behaviour
-    (-0.02, 2.0),   # light reverse
+    (-0.01, 2.0),   # light reverse
     ( 0.00, 0.5),   # final stop
 ]
 
