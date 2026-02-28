@@ -33,7 +33,7 @@ MOTOR_TYPE = mc.MotorType.BRUSHLESS
 SENSOR_TYPE = mc.SensorType.HALL_SENSOR
 
 # How fast the controller ramps output (0.0 = instant, higher = slower)
-RAMP_RATE = 0.0
+RAMP_RATE = 0.5
 
 # Flip the direction of positive power
 INVERTED = False
@@ -42,7 +42,7 @@ INVERTED = False
 MOTOR_KV = 473
 
 # Encoder ticks per full mechanical revolution
-ENCODER_COUNTS_PER_REV = 4096
+ENCODER_COUNTS_PER_REV = 0
 
 # Current limits (amps)
 SMART_CURRENT_FREE_LIMIT  = 20.0
