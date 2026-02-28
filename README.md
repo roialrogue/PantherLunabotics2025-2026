@@ -2,6 +2,8 @@
 
 ## Start up the robot power up
 
+sudo ip link set can0 type can bitrate 1000000 restart-ms 100
+
 ```bash
 sudo ip link set can0 type can bitrate 1000000
 sudo ip link set can0 txqueuelen 1000

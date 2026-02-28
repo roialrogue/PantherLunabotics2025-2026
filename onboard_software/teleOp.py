@@ -79,6 +79,7 @@ class TeleOp:
                 print("[TELEOP] DPAD_LEFT released")
         elif button == 'DPAD_RIGHT':
             if is_pressed:
+                self.robot.auger.stop()
                 print("[TELEOP] DPAD_RIGHT pressed")
             else:
                 print("[TELEOP] DPAD_RIGHT released")
