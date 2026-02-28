@@ -57,7 +57,7 @@ TEST_STEPS: list[tuple[float, float]] = [
     ( 0.00, 1.0),   # start at neutral — confirm zero output
     ( 0.1, 3.0),   # light forward
     ( 0.00, 2.0),   # back to neutral — watch idle mode behaviour
-    (-0.1, 3.0),   # light reverse
+    (-0.2, 3.0),   # light reverse
     ( 0.00, 2.0),   # final stop
 ]
 
@@ -98,7 +98,7 @@ class MotorConfigTest:
 
         # BurnFlash causes the SPARK MAX to reboot — wait for it to come back online
         print("[Init] Waiting for SPARK MAX to reboot after BurnFlash...")
-        time.sleep(3.0)
+        time.sleep(5.0)
 
         self._verify_config(config)
 
