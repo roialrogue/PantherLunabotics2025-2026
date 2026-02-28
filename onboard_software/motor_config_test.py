@@ -57,9 +57,9 @@ SMART_CURRENT_STALL_LIMIT = 80.0
 
 TEST_STEPS: list[tuple[float, float]] = [
     ( 0.00, 0.5),   # start at neutral — confirm zero output
-    ( 0.1, 2.0),   # light forward
+    ( 0.05, 2.0),   # light forward
     ( 0.00, 1.0),   # back to neutral — watch idle mode behaviour
-    (-0.2, 2.0),   # light reverse
+    (-0.05, 2.0),   # light reverse
     ( 0.00, 0.5),   # final stop
 ]
 
