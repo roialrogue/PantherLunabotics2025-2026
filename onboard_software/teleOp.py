@@ -17,42 +17,42 @@ class TeleOp:
         if button == 'A':
             if is_pressed:
                 #Forward
-                self.robot.drivetrain.set_power(-0.5,0.5,-0.5,0.5)
+                #self.robot.drivetrain.set_power(-0.5,0.5,-0.5,0.5)
                 print("[TELEOP] A button pressed")
             else:
                 print("[TELEOP] A button released")
         elif button == 'B':
             if is_pressed:
                 #strafe right
-                self.robot.drivetrain.set_power(-0.5,0.5,0.5,-0.5)
+                #self.robot.drivetrain.set_power(-0.5,0.5,0.5,-0.5)
                 print("[TELEOP] B button pressed")
             else:
                 print("[TELEOP] B button released")
         elif button == 'X':
             if is_pressed:
                 #strafe left
-                self.robot.drivetrain.set_power(0.5,-0.5,-0.5,0.5)
+                #self.robot.drivetrain.set_power(0.5,-0.5,-0.5,0.5)
                 print("[TELEOP] X button pressed")
             else:
                 print("[TELEOP] X button released")
         elif button == 'Y':
             if is_pressed:
                 #backward
-                self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
+                #self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
                 print("[TELEOP] Y button pressed")
             else:
                 print("[TELEOP] Y button released")
         elif button == 'LB':
             if is_pressed:
                 #Turn left
-                self.robot.drivetrain.set_power(-0.5,-0.5,-0.5,-0.5)
+                #self.robot.drivetrain.set_power(-0.5,-0.5,-0.5,-0.5)
                 print("[TELEOP] LB button pressed")
             else:
                 print("[TELEOP] LB button released")
         elif button == 'RB':
             if is_pressed:
                 #Turn right
-                self.robot.drivetrain.set_power(0.5,0.5,0.5,0.5)
+                #self.robot.drivetrain.set_power(0.5,0.5,0.5,0.5)
                 print("[TELEOP] RB button pressed")
             else:
                 print("[TELEOP] RB button released")
