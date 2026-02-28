@@ -13,7 +13,7 @@ import sys
 import time
 import signal
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'library/motor_controller/build'))
 import motor_controller as mc  # type: ignore
 
 # ==============================================================
@@ -95,7 +95,7 @@ class MotorConfigTest:
         config.smart_current_stall_limit = SMART_CURRENT_STALL_LIMIT
 
         self.mc.initialize_motor(self.motor_id, config)
-        self._print_config()
+        self._verify_config(config)
 
     # ----------------------------------------------------------
     # Internal helpers
@@ -106,6 +106,51 @@ class MotorConfigTest:
         self._running = False
         self.mc.set_motor_duty_cycle(self.motor_id, 0.0)
         sys.exit(0)
+
+    def _verify_config(self, intended: mc.MotorConfig) -> None:
+        print("\n[Verify] Reading parameters back from SPARK MAX over CAN...")
+        try:
+            actual = self.mc.read_motor_config(self.motor_id)
+        except Exception as exc:
+            print(f"[Verify] ERROR — could not read config: {exc}")
+            return
+
+        sep = "=" * 70
+        print(sep)
+        print(f"  CONFIG VERIFICATION   |   Motor ID: {self.motor_id}")
+        print(f"  {'Parameter':<28} {'Expected':<18} {'Actual':<18} Status")
+        print(sep)
+
+        # (label, expected value, actual value, float tolerance or None for exact match)
+        checks = [
+            ("Idle Mode",           intended.idle_mode,                 actual.idle_mode,                 None),
+            ("Motor Type",          intended.motor_type,                actual.motor_type,                None),
+            ("Sensor Type",         intended.sensor_type,               actual.sensor_type,               None),
+            ("Ramp Rate",           intended.ramp_rate,                 actual.ramp_rate,                 0.001),
+            ("Inverted",            intended.inverted,                  actual.inverted,                  None),
+            ("Motor KV",            intended.motor_kv,                  actual.motor_kv,                  None),
+            ("Encoder CPR",         intended.encoder_counts_per_rev,    actual.encoder_counts_per_rev,    None),
+            ("Current Free Limit",  intended.smart_current_free_limit,  actual.smart_current_free_limit,  0.5),
+            ("Current Stall Limit", intended.smart_current_stall_limit, actual.smart_current_stall_limit, 0.5),
+        ]
+
+        all_pass = True
+        for label, expected, read_back, tol in checks:
+            if tol is not None:
+                ok = abs(float(expected) - float(read_back)) <= tol
+            else:
+                ok = expected == read_back
+            status = "PASS" if ok else "FAIL <<<<<"
+            if not ok:
+                all_pass = False
+            print(f"  {label:<28} {str(expected):<18} {str(read_back):<18} {status}")
+
+        print(sep)
+        if all_pass:
+            print("  All parameters verified successfully.")
+        else:
+            print("  WARNING: One or more parameters did not match the flashed values!")
+        print(sep)
 
     def _print_config(self) -> None:
         sep = "=" * 58

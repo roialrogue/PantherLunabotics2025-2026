@@ -215,6 +215,28 @@ public:
     {
         return motorFeedback;
     }
+
+    // Read the configuration currently flashed on a SPARK MAX over CAN
+    MotorConfig ReadMotorConfig(int motor_ID)
+    {
+        if (connectedMotors.find(motor_ID) == connectedMotors.end())
+        {
+            throw std::runtime_error("Motor ID " + std::to_string(motor_ID) + " is not initialized.");
+        }
+
+        SparkMax& motor = connectedMotors.at(motor_ID);
+        MotorConfig config;
+        config.idleMode              = static_cast<IdleMode>(motor.GetIdleMode());
+        config.motorType             = static_cast<MotorType>(motor.GetMotorType());
+        config.sensorType            = static_cast<SensorType>(motor.GetSensorType());
+        config.rampRate              = motor.GetRampRate();
+        config.inverted              = motor.GetInverted();
+        config.motorKv               = static_cast<int>(motor.GetMotorKv());
+        config.encoderCountsPerRev   = static_cast<int>(motor.GetEncoderCountsPerRev());
+        config.smartCurrentFreeLimit  = static_cast<float>(motor.GetSmartCurrentFreeLimit());
+        config.smartCurrentStallLimit = static_cast<float>(motor.GetSmartCurrentStallLimit());
+        return config;
+    }
 };
 
 
@@ -270,7 +292,22 @@ PYBIND11_MODULE(motor_controller, m)
         .def_readwrite("motor_kv", &MotorConfig::motorKv)
         .def_readwrite("encoder_counts_per_rev", &MotorConfig::encoderCountsPerRev)
         .def_readwrite("smart_current_free_limit", &MotorConfig::smartCurrentFreeLimit)
-        .def_readwrite("smart_current_stall_limit", &MotorConfig::smartCurrentStallLimit);
+        .def_readwrite("smart_current_stall_limit", &MotorConfig::smartCurrentStallLimit)
+        .def("__repr__", [](const MotorConfig& c) {
+            return "MotorConfig("
+                   "idle_mode=" + std::to_string(static_cast<int>(c.idleMode)) +
+                   " (0=Coast,1=Brake)"
+                   ", motor_type=" + std::to_string(static_cast<int>(c.motorType)) +
+                   " (0=Brushed,1=Brushless)"
+                   ", sensor_type=" + std::to_string(static_cast<int>(c.sensorType)) +
+                   " (0=None,1=Hall,2=Encoder)"
+                   ", ramp_rate=" + std::to_string(c.rampRate) +
+                   ", inverted=" + std::string(c.inverted ? "True" : "False") +
+                   ", motor_kv=" + std::to_string(c.motorKv) +
+                   ", encoder_counts_per_rev=" + std::to_string(c.encoderCountsPerRev) +
+                   ", smart_current_free_limit=" + std::to_string(c.smartCurrentFreeLimit) +
+                   "A, smart_current_stall_limit=" + std::to_string(c.smartCurrentStallLimit) + "A)";
+        });
 
     // Bind MotorController class (singleton)
     py::class_<MotorController>(m, "MotorController")
@@ -305,5 +342,8 @@ PYBIND11_MODULE(motor_controller, m)
              py::arg("motor_id"),
              "Get the current duty cycle for a motor")
         .def("update", &MotorController::Update,
-             "Process all motors: send commands and collect feedback (call in main loop)");
+             "Process all motors: send commands and collect feedback (call in main loop)")
+        .def("read_motor_config", &MotorController::ReadMotorConfig,
+             py::arg("motor_id"),
+             "Read the configuration currently flashed on the SPARK MAX over CAN");
 }
