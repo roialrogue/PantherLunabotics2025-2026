@@ -54,11 +54,11 @@ SMART_CURRENT_STALL_LIMIT = 80.0
 # ==============================================================
 
 TEST_STEPS: list[tuple[float, float]] = [
-    ( 0.00, 1.0),   # start at neutral — confirm zero output
+    ( 0.00, 0.5),   # start at neutral — confirm zero output
     ( 0.1, 3.0),   # light forward
-    ( 0.00, 2.0),   # back to neutral — watch idle mode behaviour
+    ( 0.00, 1.0),   # back to neutral — watch idle mode behaviour
     (-0.2, 3.0),   # light reverse
-    ( 0.00, 2.0),   # final stop
+    ( 0.00, 0.5),   # final stop
 ]
 
 # How often telemetry is printed (seconds)
@@ -100,6 +100,10 @@ class MotorConfigTest:
         print("[Init] Waiting for SPARK MAX to reboot after BurnFlash...")
         time.sleep(4.0)
 
+        # Zero the encoder position so ticks start from 0 each run
+        self.mc.reset_motor_position(self.motor_id)
+        print(f"[Init] Encoder position reset to 0 for motor {self.motor_id}.")
+
         self._verify_config(config)
 
     # ----------------------------------------------------------
@@ -113,43 +117,53 @@ class MotorConfigTest:
         sys.exit(0)
 
     def _verify_config(self, intended: mc.MotorConfig) -> None:
-        print("\n[Verify] Reading parameters back from SPARK MAX over CAN...")
-        try:
-            actual = self.mc.read_motor_config(self.motor_id)
-        except Exception as exc:
-            print(f"[Verify] ERROR — could not read config: {exc}")
-            return
+        MAX_ATTEMPTS = 3
+        checks_def = [
+            ("Idle Mode",           "idle_mode",                None),
+            ("Motor Type",          "motor_type",               None),
+            ("Sensor Type",         "sensor_type",              None),
+            ("Ramp Rate",           "ramp_rate",                0.001),
+            ("Inverted",            "inverted",                 None),
+            ("Motor KV",            "motor_kv",                 None),
+            ("Encoder CPR",         "encoder_counts_per_rev",   None),
+            ("Current Free Limit",  "smart_current_free_limit", 0.5),
+            ("Current Stall Limit",  "smart_current_stall_limit", 0.5),
+        ]
+
+        for attempt in range(1, MAX_ATTEMPTS + 1):
+            print(f"\n[Verify] Reading parameters from SPARK MAX (attempt {attempt}/{MAX_ATTEMPTS})...")
+            try:
+                actual = self.mc.read_motor_config(self.motor_id)
+            except Exception as exc:
+                print(f"[Verify] ERROR — could not read config: {exc}")
+                return
+
+            results = []
+            all_pass = True
+            for label, field, tol in checks_def:
+                expected  = getattr(intended, field)
+                read_back = getattr(actual,   field)
+                ok = (abs(float(expected) - float(read_back)) <= tol
+                      if tol is not None else expected == read_back)
+                if not ok:
+                    all_pass = False
+                results.append((label, expected, read_back, ok))
+
+            if all_pass or attempt == MAX_ATTEMPTS:
+                break
+
+            print(f"[Verify] {sum(1 for *_, ok in results if not ok)} parameter(s) failed"
+                  f" — retrying in 1s...")
+            time.sleep(1.0)
 
         sep = "=" * 70
         print(sep)
         print(f"  CONFIG VERIFICATION   |   Motor ID: {self.motor_id}")
         print(f"  {'Parameter':<28} {'Expected':<18} {'Actual':<18} Status")
         print(sep)
-
-        # (label, expected value, actual value, float tolerance or None for exact match)
-        checks = [
-            ("Idle Mode",           intended.idle_mode,                 actual.idle_mode,                 None),
-            ("Motor Type",          intended.motor_type,                actual.motor_type,                None),
-            ("Sensor Type",         intended.sensor_type,               actual.sensor_type,               None),
-            ("Ramp Rate",           intended.ramp_rate,                 actual.ramp_rate,                 0.001),
-            ("Inverted",            intended.inverted,                  actual.inverted,                  None),
-            ("Motor KV",            intended.motor_kv,                  actual.motor_kv,                  None),
-            ("Encoder CPR",         intended.encoder_counts_per_rev,    actual.encoder_counts_per_rev,    None),
-            ("Current Free Limit",  intended.smart_current_free_limit,  actual.smart_current_free_limit,  0.5),
-            ("Current Stall Limit", intended.smart_current_stall_limit, actual.smart_current_stall_limit, 0.5),
-        ]
-
-        all_pass = True
-        for label, expected, read_back, tol in checks:
-            if tol is not None:
-                ok = abs(float(expected) - float(read_back)) <= tol
-            else:
-                ok = expected == read_back
+        for label, expected, read_back, ok in results:
             status = "PASS" if ok else "FAIL <<<<<"
-            if not ok:
-                all_pass = False
             print(f"  {label:<28} {str(expected):<18} {str(read_back):<18} {status}")
-
         print(sep)
         if all_pass:
             print("  All parameters verified successfully.")

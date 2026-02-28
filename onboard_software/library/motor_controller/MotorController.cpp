@@ -1,8 +1,10 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <chrono>
 #include <iostream>
 #include <map>
+#include <thread>
 #include <vector>
 #include <string>
 #include <memory>
@@ -43,6 +45,7 @@ private:
     std::map<int, SparkMax> connectedMotors;
     std::map<int, float> dutyCycles;
     std::map<int, MotorFeedback> motorFeedback;
+    std::map<int, float> positionOffsets;
 
     // Private constructor for singleton
     MotorController(std::string canbus_name) : canbus(canbus_name) {}
@@ -101,9 +104,10 @@ public:
         motor.SetSmartCurrentStallLimit(config.smartCurrentStallLimit);
         motor.BurnFlash();
 
-        // Initialize desired duty cycle and feedback to 0
-        dutyCycles[motor_ID] = 0.0f;
-        motorFeedback[motor_ID] = MotorFeedback{0.0f, 0.0f, 0.0f};
+        // Initialize desired duty cycle, feedback, and position offset to 0
+        //dutyCycles[motor_ID]      = 0.0f;
+        positionOffsets[motor_ID] = 0.0f;
+        //motorFeedback[motor_ID]   = MotorFeedback{0.0f, 0.0f, 0.0f};
     }
 
     // Initialize multiple motors with the same configuration
@@ -152,7 +156,7 @@ public:
             MotorFeedback data;
             data.dutyCycle    = motor.GetDutyCycle();
             data.velocity     = motor.GetVelocity();
-            data.position     = motor.GetPosition();
+            data.position     = motor.GetPosition() - positionOffsets[motor_ID];
             data.current      = motor.GetCurrent();
             data.temperature  = motor.GetTemperature();
             data.voltage      = motor.GetVoltage();
@@ -216,6 +220,17 @@ public:
         return motorFeedback;
     }
 
+    // Zero the position for a motor — stores current raw tick as the new reference.
+    // All subsequent position values in feedback will be relative to this point.
+    void ResetMotorPosition(int motor_ID)
+    {
+        if (connectedMotors.find(motor_ID) == connectedMotors.end())
+        {
+            throw std::runtime_error("Motor ID " + std::to_string(motor_ID) + " is not initialized.");
+        }
+        positionOffsets[motor_ID] = connectedMotors.at(motor_ID).GetPosition();
+    }
+
     // Read the configuration currently flashed on a SPARK MAX over CAN
     MotorConfig ReadMotorConfig(int motor_ID)
     {
@@ -226,15 +241,24 @@ public:
 
         SparkMax& motor = connectedMotors.at(motor_ID);
         MotorConfig config;
-        config.idleMode              = static_cast<IdleMode>(motor.GetIdleMode());
-        config.motorType             = static_cast<MotorType>(motor.GetMotorType());
-        config.sensorType            = static_cast<SensorType>(motor.GetSensorType());
-        config.rampRate              = motor.GetRampRate();
-        config.inverted              = motor.GetInverted();
-        config.motorKv               = static_cast<int>(motor.GetMotorKv());
-        config.encoderCountsPerRev   = static_cast<int>(motor.GetEncoderCountsPerRev());
-        config.smartCurrentFreeLimit  = static_cast<float>(motor.GetSmartCurrentFreeLimit());
-        config.smartCurrentStallLimit = static_cast<float>(motor.GetSmartCurrentStallLimit());
+
+        // Brief pause before each read so the SparkBase background thread can drain
+        // any pending periodic status frames from the shared CAN socket. Without this,
+        // ReadParameter's single read() call may pull a status frame instead of the
+        // parameter response, causing a random subset of reads to time out each run.
+        auto drain = []() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
+        };
+
+        drain(); config.idleMode              = static_cast<IdleMode>(motor.GetIdleMode());
+        drain(); config.motorType             = static_cast<MotorType>(motor.GetMotorType());
+        drain(); config.sensorType            = static_cast<SensorType>(motor.GetSensorType());
+        drain(); config.rampRate              = motor.GetRampRate();
+        drain(); config.inverted              = motor.GetInverted();
+        drain(); config.motorKv               = static_cast<int>(motor.GetMotorKv());
+        drain(); config.encoderCountsPerRev   = static_cast<int>(motor.GetEncoderCountsPerRev());
+        drain(); config.smartCurrentFreeLimit  = static_cast<float>(motor.GetSmartCurrentFreeLimit());
+        drain(); config.smartCurrentStallLimit = static_cast<float>(motor.GetSmartCurrentStallLimit());
         return config;
     }
 };
@@ -343,6 +367,9 @@ PYBIND11_MODULE(motor_controller, m)
              "Get the current duty cycle for a motor")
         .def("update", &MotorController::Update,
              "Process all motors: send commands and collect feedback (call in main loop)")
+        .def("reset_motor_position", &MotorController::ResetMotorPosition,
+             py::arg("motor_id"),
+             "Zero the position counter for a motor (software offset — no hardware reset)")
         .def("read_motor_config", &MotorController::ReadMotorConfig,
              py::arg("motor_id"),
              "Read the configuration currently flashed on the SPARK MAX over CAN");
