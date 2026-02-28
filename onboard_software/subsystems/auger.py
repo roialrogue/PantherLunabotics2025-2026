@@ -6,12 +6,23 @@ import robot_params
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
 import motor_controller # type: ignore
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from library import telemetry_logger
+
+# Subsystem Parameters
+
+# Note: if this is changed, update print data on line 86 as well
+_LOG_COLUMNS = ["Duty Cycle", "Velocity (RPM)", "Position (ticks)", "Current (A)", "Temp (°C)", "Bus Voltage (V)"]
+
+
+
 class Auger:
 
     def __init__(self, mc):
         self.mc = mc
         self.motor_id = 3
         self._last_telemetry_time = 0.0
+        self._logger = telemetry_logger.TelemetryLogger("auger")
 
         config = motor_controller.MotorConfig()
         config.idle_mode = motor_controller.IdleMode.BRAKE
@@ -37,6 +48,12 @@ class Auger:
 
     def stop(self):
         self.set_power(0.0)
+
+    def start_logging(self):
+        self._logger.start_logging(self._LOG_COLUMNS)
+
+    def stop_logging(self):
+        self._logger.stop_logging()
 
     def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=True, voltage=True, interval=0.1):
         now = time.monotonic()
@@ -64,3 +81,10 @@ class Auger:
             return
 
         print(f"{robot_params.robot_timer.timestamp()} [Auger] " + ", ".join(parts))
+
+        if self._logger.is_logging:
+            self._logger.log_row(
+                robot_params.robot_timer.timestamp(),
+                [feedback.duty_cycle, feedback.velocity, feedback.position,
+                 feedback.current, feedback.temperature, feedback.voltage]
+            )
