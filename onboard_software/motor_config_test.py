@@ -33,10 +33,10 @@ MOTOR_TYPE = mc.MotorType.BRUSHLESS
 SENSOR_TYPE = mc.SensorType.HALL_SENSOR
 
 # How fast the controller ramps output (0.0 = instant, higher = slower)
-RAMP_RATE = 0.9
+RAMP_RATE = 0.0
 
 # Flip the direction of positive power
-INVERTED = True
+INVERTED = False
 
 # KV rating of the motor (RPM per volt)
 MOTOR_KV = 473
