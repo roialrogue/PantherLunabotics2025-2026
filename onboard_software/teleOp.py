@@ -1,47 +1,106 @@
 from __future__ import annotations
-import robot
+import time
+import robot_params
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    import robot
 
-class Teleop:
+class TeleOp:
+
     def __init__(self, robot: robot.Robot):
         self.robot = robot
+        self._last_update_time = time.monotonic()
 
     # Called only when there is a button event
     def on_button_event(self, button, is_pressed):
         if button == 'A':
             if is_pressed:
+                #Forward
+                #self.robot.drivetrain.set_power(-0.5,0.5,-0.5,0.5)
                 print("[TELEOP] A button pressed")
             else:
                 print("[TELEOP] A button released")
         elif button == 'B':
             if is_pressed:
+                #strafe right
+                #self.robot.drivetrain.set_power(-0.5,0.5,0.5,-0.5)
                 print("[TELEOP] B button pressed")
             else:
                 print("[TELEOP] B button released")
         elif button == 'X':
             if is_pressed:
+                #strafe left
+                #self.robot.drivetrain.set_power(0.5,-0.5,-0.5,0.5)
                 print("[TELEOP] X button pressed")
             else:
                 print("[TELEOP] X button released")
         elif button == 'Y':
             if is_pressed:
+                #backward
+                #self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
                 print("[TELEOP] Y button pressed")
             else:
                 print("[TELEOP] Y button released")
         elif button == 'LB':
             if is_pressed:
+                #Turn left
+                #self.robot.drivetrain.set_power(-0.5,-0.5,-0.5,-0.5)
                 print("[TELEOP] LB button pressed")
             else:
                 print("[TELEOP] LB button released")
         elif button == 'RB':
             if is_pressed:
+                #Turn right
+                #self.robot.drivetrain.set_power(0.5,0.5,0.5,0.5)
                 print("[TELEOP] RB button pressed")
             else:
                 print("[TELEOP] RB button released")
+        elif button == 'DPAD_UP':
+            if is_pressed:
+                #Intake
+                self.robot.auger.intake()
+                print("[TELEOP] DPAD_UP pressed")
+            else:
+                print("[TELEOP] DPAD_UP released")
+        elif button == 'DPAD_DOWN':
+            if is_pressed:
+                #Outtake
+                self.robot.auger.outtake()
+                print("[TELEOP] DPAD_DOWN pressed")
+            else:
+                print("[TELEOP] DPAD_DOWN released")
+        elif button == 'DPAD_LEFT':
+            if is_pressed:
+                #Off
+                self.robot.drivetrain.set_power(0.0,0.0,0.0,0.0)
+                print("[TELEOP] DPAD_LEFT pressed")
+            else:
+                print("[TELEOP] DPAD_LEFT released")
+        elif button == 'DPAD_RIGHT':
+            if is_pressed:
+                self.robot.auger.stop()
+                print("[TELEOP] DPAD_RIGHT pressed")
+            else:
+                print("[TELEOP] DPAD_RIGHT released")
+
+    """Called at 50Hz — put all periodic tasks here."""
+    def periodic_loop(self):
+
+        #self.robot.drivetrain.set_power(0.1, 0.1, 0.1, 0.1)
+        #self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
+        
+        # Update motor controller
+        try:
+            self.robot.motor_controller.update()
+        except RuntimeError as e:
+            print(f"[TeleOp] CAN error: {e}")
 
     def run_teleOp_step(self):
-        pass
 
-        # Telemetry can not be run in this loop to low frequency (clogs up client server coms)
-        # joystick_values = self.robot.controller.AxisValues.__str__()
-        # self.robot.print_telemetry(f"Joystick values: {joystick_values}")
+        # Update periodic loop
+        now = time.monotonic()
+        elapsed = now - self._last_update_time
+        if elapsed >= robot_params.LoopConfig.UPDATE_PERIOD_S:
+            self.periodic_loop()
+            self._last_update_time = now

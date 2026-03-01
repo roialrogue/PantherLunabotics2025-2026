@@ -21,6 +21,8 @@ Button 4 - LB
 Button 5 - RB
 Button 6 - Options
 Button 7 - Start
+
+Hat 0 - D-Pad (x: L = -1, R = 1 | y: D = -1, U = 1)
 '''
 
 class Control:
@@ -86,6 +88,16 @@ class Control:
             "LB": 4,
             "RB": 5
         }
+
+        # D-pad hat state: maps (x, y) offset -> button name
+        dpad_map = {
+            ( 0,  1): "DPAD_UP",
+            ( 0, -1): "DPAD_DOWN",
+            (-1,  0): "DPAD_LEFT",
+            ( 1,  0): "DPAD_RIGHT",
+        }
+        prev_hat = (0, 0)
+
         last_command = None
 
         while self.running:
@@ -127,6 +139,18 @@ class Control:
                             self.client.send_command(buttonCommand)
                             #print(buttonCommand)
 
+                elif event.type == pygame.JOYHATMOTION:
+                    curr_hat = event.value
+                    # Check each direction independently to support diagonals
+                    for (ox, oy), name in dpad_map.items():
+                        was_active = (ox != 0 and prev_hat[0] == ox) or (oy != 0 and prev_hat[1] == oy)
+                        is_active  = (ox != 0 and curr_hat[0] == ox) or (oy != 0 and curr_hat[1] == oy)
+                        if was_active and not is_active:
+                            self.client.send_command((self.mode, name, "RELEASED"))
+                        elif is_active and not was_active:
+                            self.client.send_command((self.mode, name, "PRESSED"))
+                    prev_hat = curr_hat
+
             commands = (self.mode, x, y, yaw_rate, pitch_rate, lt, rt)
             if commands != last_command and self.mode == "TELEOP": # For now only TELEOP uses axes
                 self.client.send_command(commands)
@@ -142,5 +166,5 @@ class Control:
         self.client.stop()
 
 if __name__ == "__main__":
-    server_ip = "localhost"  # Robot IP address: 100.67.49.108
+    server_ip = "100.76.221.110"  # RP IP = "100.76.221.110"
     Control(server_ip).run()

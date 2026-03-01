@@ -1,0 +1,109 @@
+import sys
+import os
+import time
+from library.util import Util
+import robot_params
+import math
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
+import motor_controller # type: ignore
+
+class Drivetrain:
+
+    def __init__(self, mc):
+        self.slow_turning = True
+        self.max_speed = 0.2
+        self._last_telemetry_time = 0.0
+
+        self.mc = mc
+        self.left_motor_ids = [7, 1] #Order: front left, back left
+        self.right_motor_ids = [4, 2] #back right, back left
+
+        # This config is the same as default so techonically it is not needed.
+        config = motor_controller.MotorConfig() # left side motors
+        config.idle_mode = motor_controller.IdleMode.BRAKE
+        config.motor_type = motor_controller.MotorType.BRUSHLESS
+        config.sensor_type = motor_controller.SensorType.HALL_SENSOR
+        config.ramp_rate = 0.0
+        config.inverted = False
+        config.motor_kv = 480
+        config.encoder_counts_per_rev = 4096
+        config.smart_current_free_limit = 20.0
+        config.smart_current_stall_limit = 80.0
+
+        config = motor_controller.MotorConfig() #right motors
+        config.idle_mode = motor_controller.IdleMode.BRAKE
+        config.motor_type = motor_controller.MotorType.BRUSHLESS
+        config.sensor_type = motor_controller.SensorType.HALL_SENSOR
+        config.ramp_rate = 0.0
+        config.inverted = True
+        config.motor_kv = 480
+        config.encoder_counts_per_rev = 4096
+        config.smart_current_free_limit = 20.0
+        config.smart_current_stall_limit = 80.0
+
+        self.mc.initialize_motors(self.left_motor_ids, config)
+        self.mc.initialize_motors(self.right_motor_ids, config)
+
+    def set_slow_turning(self, slow_turning):
+        self.slow_turning = slow_turning
+
+    def set_max_speed(self, max_speed):
+        self.max_speed = max_speed
+
+    def set_power(self, front_right_power, front_left_power, back_right_power, back_left_power):
+        print("setting power")
+        self.mc.set_motor_duty_cycle(self.right_motor_ids[0], Util.clip(front_right_power, -self.max_speed, self.max_speed))
+        self.mc.set_motor_duty_cycle(self.left_motor_ids[0], Util.clip(front_left_power, -self.max_speed, self.max_speed))
+        self.mc.set_motor_duty_cycle(self.right_motor_ids[1], Util.clip(back_right_power, -self.max_speed, self.max_speed))
+        self.mc.set_motor_duty_cycle(self.left_motor_ids[1], Util.clip(back_left_power, -self.max_speed, self.max_speed))
+
+    def drive_task(self, y_axis, x_axis, turning_axis):
+        y = -(math.atan(5 * y_axis) / math.atan(5)) #Note: negative
+        x = (math.atan(5 * x_axis) / math.atan(5)) * 1.1 # Strafing compensation
+        turning = (math.atan(5 * turning_axis) / math.atan(5))
+
+        if self.slow_turning:
+            turning *= 0.5 # Slow down turning
+
+        denominator = max(abs(y) + abs(x) + abs(turning), 1)
+        front_right_power = (y - x - turning) / denominator
+        front_left_power = (y + x + turning) / denominator
+        back_right_power = (y + x - turning) / denominator
+        back_left_power = (y - x + turning) / denominator
+
+        self.set_power(front_right_power, front_left_power, back_right_power, back_left_power)
+
+    def stop(self):
+        self.set_power(0, 0, 0, 0)
+
+    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=True, voltage=True, interval=0.1):
+        now = time.monotonic()
+        if now - self._last_telemetry_time < interval:
+            return
+        self._last_telemetry_time = now
+
+        motors = [
+            ("FL", self.left_motor_ids[0]),
+            ("BL", self.left_motor_ids[1]),
+            ("FR", self.right_motor_ids[0]),
+            ("BR", self.right_motor_ids[1]),
+        ]
+
+        for label, motor_id in motors:
+            feedback = self.mc.get_motor_feedback(motor_id)
+            parts = []
+            if duty_cycle:
+                parts.append(f"Duty Cycle: {feedback.duty_cycle:.4f}")
+            if velocity:
+                parts.append(f"Velocity: {feedback.velocity:.2f} RPM")
+            if position:
+                parts.append(f"Position: {feedback.position:.1f} ticks")
+            if current:
+                parts.append(f"Current: {feedback.current:.2f} A")
+            if temperature:
+                parts.append(f"Temp: {feedback.temperature:.1f} °C")
+            if voltage:
+                parts.append(f"Bus: {feedback.voltage:.2f} V")
+            if parts:
+                print(f"{robot_params.robot_timer.timestamp()} [Drivetrain {label}] " + ", ".join(parts))

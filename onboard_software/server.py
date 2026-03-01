@@ -7,10 +7,11 @@ import time
 class Server: # Robot Server
     def __init__(self):
         self.host = "0.0.0.0"
-        self.port = 1010
+        self.port = 8080
         # AF_INET is used for IPv4 protocols
         # SOCK_STREAM is used for TCP packets
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((self.host, self.port))
         print("[Server] Socket binded to %s:%d" % (self.host, self.port))
         self.server_socket.listen(1) # Allow only 1 connection

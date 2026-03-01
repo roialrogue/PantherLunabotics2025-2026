@@ -7,7 +7,7 @@ import time
 class Client: # Laptop Client robot controller
     def __init__(self, server_ip):
         self.host = server_ip
-        self.port = 1010
+        self.port = 8080
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.input_queue = queue.Queue() # For incoming telemetry and ACKs
         self.output_queue = queue.Queue() # For outgoing commands and ACKs

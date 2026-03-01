@@ -1,10 +1,16 @@
 from __future__ import annotations
-import robot
+import time
+import robot_params
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    import robot
 
 class Auto:
+
     def __init__(self, robot: robot.Robot):
         self.robot = robot
+        self._last_update_time = time.monotonic()
 
     # Called only when there is a button event
     def on_button_event(self, button, is_pressed):
@@ -38,6 +44,38 @@ class Auto:
                 print("[AUTO] RB button pressed")
             else:
                 print("[AUTO] RB button released")
+        elif button == 'DPAD_UP':
+            if is_pressed:
+                print("[AUTO] DPAD_UP pressed")
+            else:
+                print("[AUTO] DPAD_UP released")
+        elif button == 'DPAD_DOWN':
+            if is_pressed:
+                print("[AUTO] DPAD_DOWN pressed")
+            else:
+                print("[AUTO] DPAD_DOWN released")
+        elif button == 'DPAD_LEFT':
+            if is_pressed:
+                print("[AUTO] DPAD_LEFT pressed")
+            else:
+                print("[AUTO] DPAD_LEFT released")
+        elif button == 'DPAD_RIGHT':
+            if is_pressed:
+                print("[AUTO] DPAD_RIGHT pressed")
+            else:
+                print("[AUTO] DPAD_RIGHT released")
+
+    """Called at 50Hz — put all periodic tasks here."""
+    def periodic_loop(self):
+
+        # Update motor controller
+        robot.mc.update()
 
     def run_auto_step(self):
-        pass
+
+        # Update periodic loop
+        now = time.monotonic()
+        elapsed = now - self._last_update_time
+        if elapsed >= robot_params.LoopConfig.UPDATE_PERIOD_S:
+            self.periodic_loop()
+            self._last_update_time = now
