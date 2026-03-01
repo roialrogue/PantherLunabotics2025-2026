@@ -31,3 +31,13 @@ source lunaenv/bin/activate
 
 ## TODO:
 
+Phase 1:
+1. Just run the robot and generally verify everything is working
+2. Test new motor directions
+3. Slove drive math
+
+4. Clean up client server code 
+
+Phase 2:
+1. Figure out all the required sensor for auto and how to use all of them 
+
