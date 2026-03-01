@@ -10,11 +10,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from library import telemetry_logger
 
 # Subsystem Parameters
+logTelemetryData = False
 
 # Note: if this is changed, update print data on line 86 as well
 _LOG_COLUMNS = ["Duty Cycle", "Velocity (RPM)", "Position (ticks)", "Current (A)", "Temp (°C)", "Bus Voltage (V)"]
-
-
 
 class Auger:
 
@@ -31,7 +30,6 @@ class Auger:
         config.ramp_rate = 0.0
         config.inverted = False
         config.motor_kv = 480
-        config.encoder_counts_per_rev = 4096
         config.smart_current_free_limit = 20.0
         config.smart_current_stall_limit = 80.0
 
@@ -55,7 +53,7 @@ class Auger:
     def stop_logging(self):
         self._logger.stop_logging()
 
-    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=True, voltage=True, interval=0.1):
+    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=0.05):
         now = time.monotonic()
         if now - self._last_telemetry_time < interval:
             return
@@ -82,7 +80,7 @@ class Auger:
 
         print(f"{robot_params.robot_timer.timestamp()} [Auger] " + ", ".join(parts))
 
-        if self._logger.is_logging:
+        if self._logger.is_logging():
             self._logger.log_row(
                 robot_params.robot_timer.timestamp(),
                 [feedback.duty_cycle, feedback.velocity, feedback.position,

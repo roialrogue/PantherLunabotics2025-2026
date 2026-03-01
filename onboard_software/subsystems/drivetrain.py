@@ -8,6 +8,20 @@ import math
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
 import motor_controller # type: ignore
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from library import telemetry_logger
+
+# Subsystem Parameters
+logTelemetryData = False
+
+# Note: if this is changed, update log_row data in print_telemetry as well
+_LOG_COLUMNS = [
+    "FL Duty Cycle", "FL Velocity (RPM)", "FL Position (ticks)", "FL Current (A)", "FL Temp (°C)", "FL Bus Voltage (V)",
+    "BL Duty Cycle", "BL Velocity (RPM)", "BL Position (ticks)", "BL Current (A)", "BL Temp (°C)", "BL Bus Voltage (V)",
+    "FR Duty Cycle", "FR Velocity (RPM)", "FR Position (ticks)", "FR Current (A)", "FR Temp (°C)", "FR Bus Voltage (V)",
+    "BR Duty Cycle", "BR Velocity (RPM)", "BR Position (ticks)", "BR Current (A)", "BR Temp (°C)", "BR Bus Voltage (V)",
+]
+
 class Drivetrain:
 
     def __init__(self, mc):
@@ -16,6 +30,7 @@ class Drivetrain:
         self._last_telemetry_time = 0.0
 
         self.mc = mc
+        self._logger = telemetry_logger.TelemetryLogger("drivetrain")
         self.left_motor_ids = [7, 1] #Order: front left, back left
         self.right_motor_ids = [4, 2] #back right, back left
 
@@ -44,6 +59,12 @@ class Drivetrain:
 
         self.mc.initialize_motors(self.left_motor_ids, config)
         self.mc.initialize_motors(self.right_motor_ids, config)
+
+    def start_logging(self):
+        self._logger.start_logging(_LOG_COLUMNS)
+
+    def stop_logging(self):
+        self._logger.stop_logging()
 
     def set_slow_turning(self, slow_turning):
         self.slow_turning = slow_turning
@@ -77,7 +98,7 @@ class Drivetrain:
     def stop(self):
         self.set_power(0, 0, 0, 0)
 
-    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=True, voltage=True, interval=0.1):
+    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=0.05):
         now = time.monotonic()
         if now - self._last_telemetry_time < interval:
             return
@@ -90,8 +111,9 @@ class Drivetrain:
             ("BR", self.right_motor_ids[1]),
         ]
 
-        for label, motor_id in motors:
-            feedback = self.mc.get_motor_feedback(motor_id)
+        feedbacks = [(label, self.mc.get_motor_feedback(motor_id)) for label, motor_id in motors]
+
+        for label, feedback in feedbacks:
             parts = []
             if duty_cycle:
                 parts.append(f"Duty Cycle: {feedback.duty_cycle:.4f}")
@@ -107,3 +129,9 @@ class Drivetrain:
                 parts.append(f"Bus: {feedback.voltage:.2f} V")
             if parts:
                 print(f"{robot_params.robot_timer.timestamp()} [Drivetrain {label}] " + ", ".join(parts))
+
+        if self._logger.is_logging:
+            row = []
+            for _, fb in feedbacks:
+                row.extend([fb.duty_cycle, fb.velocity, fb.position, fb.current, fb.temperature, fb.voltage])
+            self._logger.log_row(robot_params.robot_timer.timestamp(), row)
