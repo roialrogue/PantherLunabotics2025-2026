@@ -57,7 +57,7 @@ class Control:
         self.client.send_command("READY") # Notify robot that client is ready
 
         print("[Control] Waiting for mode selection: \n Press A for TELEOP \n Press B for AUTO\n")
-        while self.mode == None:
+        while self.mode is None:
             pygame.event.pump()
             for event in pygame.event.get():
                 if event.type == pygame.JOYBUTTONDOWN:

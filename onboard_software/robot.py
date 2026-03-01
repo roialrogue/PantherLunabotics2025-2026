@@ -47,7 +47,7 @@ class Robot:
         robot_params.robot_timer.start()
         print("[Robot] Startup complete!")
 
-    def print_telemetry(self, data):
+    def send_telemetry(self, data):
         self.server.send_telemetry(data)
 
     def run(self):

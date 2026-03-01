@@ -1,14 +1,8 @@
-import sys
-import os
 import time
 from library.util import Util
 import robot_params
 import math
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
-import motor_controller # type: ignore
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import motor_controller  # type: ignore  (path set by robot.py)
 from library import telemetry_logger
 
 # Subsystem Parameters

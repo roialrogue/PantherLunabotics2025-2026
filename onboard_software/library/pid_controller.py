@@ -109,7 +109,7 @@ class PIDController:
 
     def setTimeout(self, timeout):
         self.timeout = timeout
-        self.timeoutStartTime = time.time()
+        self.timeoutStartTime = time.monotonic()
 
     def resetTimeout(self):
         self.timeout = 0.0
@@ -118,7 +118,7 @@ class PIDController:
     def isOnTarget(self, tolerance, settlingTime):
         onTarget = False
 
-        current_time = time.time()
+        current_time = time.monotonic()
         abs_error = abs(self.error)
 
         if (self.no_oscillation):
@@ -127,7 +127,7 @@ class PIDController:
         elif (self.timeout > 0.0 and  current_time - self.timeoutStartTime >= self.timeout):
             onTarget = True
         elif (abs_error > tolerance):
-            self.settlingStartTime = time.time()
+            self.settlingStartTime = time.monotonic()
         elif (settlingTime == 0.0 or current_time >= self.settlingStartTime + settlingTime):
             onTarget = True
 
@@ -144,7 +144,7 @@ class PIDController:
 
         # Delta time calculation
         self.prevTimestamp = self.timestamp
-        self.timestamp = time.time()
+        self.timestamp = time.monotonic()
         delta_time = self.timestamp - self.prevTimestamp if self.prevTimestamp is not None else 0.0
         delta_error = (self.error - self.previous_error) / delta_time if delta_time > 0.0 else 0.0
 
