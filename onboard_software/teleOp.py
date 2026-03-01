@@ -17,32 +17,32 @@ class TeleOp:
         if button == 'A':
             if is_pressed:
                 #Forward
-                if robot_params.robotConfig.useDrivetrain:
+                if robot_params.RobotConfig.useDrivetrain:
                     self.robot.drivetrain.set_power(-0.5,0.5,-0.5,0.5)
         elif button == 'B':
             if is_pressed:
                 #strafe right
-                if robot_params.robotConfig.useDrivetrain:
+                if robot_params.RobotConfig.useDrivetrain:
                     self.robot.drivetrain.set_power(-0.5,0.5,0.5,-0.5)
         elif button == 'X':
             if is_pressed:
                 #strafe left
-                if robot_params.robotConfig.useDrivetrain:
+                if robot_params.RobotConfig.useDrivetrain:
                     self.robot.drivetrain.set_power(0.5,-0.5,-0.5,0.5)
         elif button == 'Y':
             if is_pressed:
                 #backward
-                if robot_params.robotConfig.useDrivetrain:
+                if robot_params.RobotConfig.useDrivetrain:
                     self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
         elif button == 'LB':
             if is_pressed:
                 #Turn left
-                if robot_params.robotConfig.useDrivetrain:
+                if robot_params.RobotConfig.useDrivetrain:
                     self.robot.drivetrain.set_power(-0.5,-0.5,-0.5,-0.5)
         elif button == 'RB':
             if is_pressed:
                 #Turn right
-                if robot_params.robotConfig.useDrivetrain:
+                if robot_params.RobotConfig.useDrivetrain:
                     self.robot.drivetrain.set_power(0.5,0.5,0.5,0.5)
         elif button == 'DPAD_UP':
             if is_pressed:
@@ -55,7 +55,7 @@ class TeleOp:
         elif button == 'DPAD_LEFT':
             if is_pressed:
                 #Off
-                if robot_params.robotConfig.useDrivetrain:
+                if robot_params.RobotConfig.useDrivetrain:
                     self.robot.drivetrain.set_power(0.0,0.0,0.0,0.0)
         elif button == 'DPAD_RIGHT':
             if is_pressed:
@@ -64,7 +64,7 @@ class TeleOp:
     """Called at 50Hz — put all periodic tasks here."""
     def periodic_loop(self):
 
-        #if robot_params.robotConfig.useDrivetrain:
+        #if robot_params.RobotConfig.useDrivetrain:
         #    self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
         
         # Update motor controller

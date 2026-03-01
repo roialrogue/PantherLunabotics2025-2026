@@ -36,7 +36,13 @@ class Robot:
         self.teleop = teleOp.TeleOp(self)
         self.auto = auto.Auto(self)
 
+        startup_timeout = 60 # seconds
+        startup_start = time.monotonic()
         while self.server.get_command() != "READY":
+            if time.monotonic() - startup_start > startup_timeout:
+                print("[Robot] Timed out waiting for READY from mission control")
+                self.stop()
+                return
             time.sleep(0.1)
         robot_params.robot_timer.start()
         print("[Robot] Startup complete!")

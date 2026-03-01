@@ -1,4 +1,4 @@
-import time;
+import time
 from dataclasses import dataclass
 from library.util import Util
 
@@ -51,6 +51,7 @@ class PIDController:
         self.error = 0.0
         self.target_sign = 0.0
         self.output = 0.0
+        self.integral_error = 0.0
 
         # OnTarget variables
         self.settlingStartTime = 0.0
@@ -74,6 +75,7 @@ class PIDController:
         self.error = 0.0
         self.target_sign = 0.0
         self.output = 0.0
+        self.integral_error = 0.0
         # OnTarget variables
         self.settlingStartTime = 0.0
         self.timeoutStartTime = 0.0
@@ -155,13 +157,13 @@ class PIDController:
 
         # Integral error calculation with iZone consideration
         if (abs(self.error) > self.iZone):
-            integral_error = 0.0
+            self.integral_error = 0.0
         elif (self.ki != 0.0):
-            integral_error += self.error * delta_time
+            self.integral_error += self.error * delta_time
 
         # PIDF output calculation
         P_Term = self.kp * self.error
-        I_Term = self.ki * integral_error
+        I_Term = self.ki * self.integral_error
         D_Term = self.kd * delta_error
         F_Term = self.kf * target
 
@@ -171,7 +173,7 @@ class PIDController:
         return self.output
     
     def inputMod(self, error, lower_bound, upper_bound):
-        # Wrap input if its's above the manimum input
+        # Wrap input if its's above the minimum input
         numMax = int((error - lower_bound) / self.input_modulus)
         error -= numMax * self.input_modulus
 

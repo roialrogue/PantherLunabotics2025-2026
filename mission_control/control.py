@@ -49,10 +49,11 @@ class Control:
             print(f"[Control] \033[35mTelemetry\033[0m: {telemetry}")
 
     def run(self):
-        self.client_t =  threading.Thread(target=self.client.connect)
+        self.client_t = threading.Thread(target=self.client.connect)
         self.client_t.start()
-        time.sleep(2.5)  # Give some time for the client to connect
-        if not self.client_t.is_alive(): return
+        if not self.client.connected.wait(timeout=10):
+            print("[Control] Failed to connect to robot within 10 seconds")
+            return
         self.client.send_command("READY") # Notify robot that client is ready
 
         print("[Control] Waiting for mode selection: \n Press A for TELEOP \n Press B for AUTO\n")

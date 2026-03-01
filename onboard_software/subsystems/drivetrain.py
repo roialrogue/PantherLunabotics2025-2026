@@ -31,34 +31,32 @@ class Drivetrain:
 
         self.mc = mc
         self._logger = telemetry_logger.TelemetryLogger("drivetrain")
-        self.left_motor_ids = [7, 1] #Order: front left, back left
-        self.right_motor_ids = [4, 2] #back right, back left
+        self.left_motor_ids = [7, 1] #front left, back left
+        self.right_motor_ids = [4, 2] #front right, back right
 
-        # This config is the same as default so techonically it is not needed.
-        config = motor_controller.MotorConfig() # left side motors
-        config.idle_mode = motor_controller.IdleMode.BRAKE
-        config.motor_type = motor_controller.MotorType.BRUSHLESS
-        config.sensor_type = motor_controller.SensorType.HALL_SENSOR
-        config.ramp_rate = 0.0
-        config.inverted = False
-        config.motor_kv = 480
-        config.encoder_counts_per_rev = 4096
-        config.smart_current_free_limit = 20.0
-        config.smart_current_stall_limit = 80.0
+        # This config is the same as default so technically it is not needed.
+        configL = motor_controller.MotorConfig() # left motors
+        configL.idle_mode = motor_controller.IdleMode.BRAKE
+        configL.motor_type = motor_controller.MotorType.BRUSHLESS
+        configL.sensor_type = motor_controller.SensorType.HALL_SENSOR
+        configL.ramp_rate = 0.0
+        configL.inverted = False
+        configL.motor_kv = 480
+        configL.smart_current_free_limit = 20.0
+        configL.smart_current_stall_limit = 80.0
 
-        config = motor_controller.MotorConfig() #right motors
-        config.idle_mode = motor_controller.IdleMode.BRAKE
-        config.motor_type = motor_controller.MotorType.BRUSHLESS
-        config.sensor_type = motor_controller.SensorType.HALL_SENSOR
-        config.ramp_rate = 0.0
-        config.inverted = True
-        config.motor_kv = 480
-        config.encoder_counts_per_rev = 4096
-        config.smart_current_free_limit = 20.0
-        config.smart_current_stall_limit = 80.0
+        configR = motor_controller.MotorConfig() #right motors
+        configR.idle_mode = motor_controller.IdleMode.BRAKE
+        configR.motor_type = motor_controller.MotorType.BRUSHLESS
+        configR.sensor_type = motor_controller.SensorType.HALL_SENSOR
+        configR.ramp_rate = 0.0
+        configR.inverted = True
+        configR.motor_kv = 480
+        configR.smart_current_free_limit = 20.0
+        configR.smart_current_stall_limit = 80.0
 
-        self.mc.initialize_motors(self.left_motor_ids, config)
-        self.mc.initialize_motors(self.right_motor_ids, config)
+        self.mc.initialize_motors(self.left_motor_ids, configL)
+        self.mc.initialize_motors(self.right_motor_ids, configR)
 
     def start_logging(self):
         self._logger.start_logging(_LOG_COLUMNS)
@@ -73,7 +71,6 @@ class Drivetrain:
         self.max_speed = max_speed
 
     def set_power(self, front_right_power, front_left_power, back_right_power, back_left_power):
-        print("setting power")
         self.mc.set_motor_duty_cycle(self.right_motor_ids[0], Util.clip(front_right_power, -self.max_speed, self.max_speed))
         self.mc.set_motor_duty_cycle(self.left_motor_ids[0], Util.clip(front_left_power, -self.max_speed, self.max_speed))
         self.mc.set_motor_duty_cycle(self.right_motor_ids[1], Util.clip(back_right_power, -self.max_speed, self.max_speed))

@@ -229,6 +229,7 @@ public:
         positionOffsets[motor_ID] = connectedMotors.at(motor_ID).GetPosition();
     }
 
+    //Note: method very buggy
     // Read the configuration currently flashed on a SPARK MAX over CAN
     MotorConfig ReadMotorConfig(int motor_ID)
     {

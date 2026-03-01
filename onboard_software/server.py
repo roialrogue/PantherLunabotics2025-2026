@@ -105,11 +105,11 @@ class Server: # Robot Server
                 if current_time - sent_time > self.ack_timeout:
                     to_resend.append(msg)
             for msg in to_resend:
-                print(f"[Server] Resending unacknowledged message: {msg}") 
+                print(f"[Server] Resending unacknowledged message: {msg}")
                 self.output_queue.put(msg)
                 self.pending_acks[msg['id']] = (msg, time.time()) # Update the timestamp in pending ACKs
             time.sleep(0.5)  # Check every 0.5 seconds
-    
+
     def stop(self):
         self.running = False
         try:

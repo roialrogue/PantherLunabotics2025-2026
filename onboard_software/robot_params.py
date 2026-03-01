@@ -1,12 +1,12 @@
 # RobotParams
-# Stores all constants and configs used acrooss the robot codebase.
+# Stores all constants and configs used across the robot codebase.
 
 import time
 
 # Global timer instance to be initialized by robot.py on startup
 robot_timer = None
 
-class robotConfig:
+class RobotConfig:
     useDrivetrain = False
     useAuger = False
 

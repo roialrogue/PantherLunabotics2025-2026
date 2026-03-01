@@ -69,7 +69,7 @@ class Auto:
     def periodic_loop(self):
 
         # Update motor controller
-        robot.mc.update()
+        self.robot.motor_controller.update()
 
     def run_auto_step(self):
 
