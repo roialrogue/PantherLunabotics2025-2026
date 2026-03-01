@@ -3,6 +3,13 @@
 
 import time
 
+# Global timer instance to be initialized by robot.py on startup
+robot_timer = None
+
+class robotConfig:
+    useDrivetrain = False
+    useAuger = False
+
 class LoopConfig:
     UPDATE_RATE_HZ = 50  # Change this to adjust loop frequency
     UPDATE_PERIOD_S = 1.0 / UPDATE_RATE_HZ  # 0.02s at 50Hz
@@ -24,6 +31,3 @@ class RobotTimer:
         minutes = int(e) // 60
         seconds = e % 60
         return f"[T+{minutes:02d}:{seconds:05.2f}]"
-
-# Global timer instance to be initialized by robot.py on startup
-robot_timer: RobotTimer | None = None

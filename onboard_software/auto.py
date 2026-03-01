@@ -16,54 +16,54 @@ class Auto:
     def on_button_event(self, button, is_pressed):
         if button == 'A':
             if is_pressed:
-                print("[AUTO] A button pressed")
+                pass
             else:
-                print("[AUTO] A button released")
+                pass
         elif button == 'B':
             if is_pressed:
-                print("[AUTO] B button pressed")
+                pass
             else:
-                print("[AUTO] B button released")
+                pass
         elif button == 'X':
             if is_pressed:
-                print("[AUTO] X button pressed")
+                pass
             else:
-                print("[AUTO] X button released")
+                pass
         elif button == 'Y':
             if is_pressed:
-                print("[AUTO] Y button pressed")
+                pass
             else:
-                print("[AUTO] Y button released")
+                pass
         elif button == 'LB':
             if is_pressed:
-                print("[AUTO] LB button pressed")
+                pass
             else:
-                print("[AUTO] LB button released")
+                pass
         elif button == 'RB':
             if is_pressed:
-                print("[AUTO] RB button pressed")
+                pass
             else:
-                print("[AUTO] RB button released")
+                pass
         elif button == 'DPAD_UP':
             if is_pressed:
-                print("[AUTO] DPAD_UP pressed")
+                pass
             else:
-                print("[AUTO] DPAD_UP released")
+                pass
         elif button == 'DPAD_DOWN':
             if is_pressed:
-                print("[AUTO] DPAD_DOWN pressed")
+                pass
             else:
-                print("[AUTO] DPAD_DOWN released")
+                pass
         elif button == 'DPAD_LEFT':
             if is_pressed:
-                print("[AUTO] DPAD_LEFT pressed")
+                pass
             else:
-                print("[AUTO] DPAD_LEFT released")
+                pass
         elif button == 'DPAD_RIGHT':
             if is_pressed:
-                print("[AUTO] DPAD_RIGHT pressed")
+                pass
             else:
-                print("[AUTO] DPAD_RIGHT released")
+                pass
 
     """Called at 50Hz — put all periodic tasks here."""
     def periodic_loop(self):
