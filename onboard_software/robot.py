@@ -12,6 +12,8 @@ from subsystems import auger
 from library import controller
 import robot_params
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
+import motor_controller as mc  # type: ignore
 
 def init_can_bus(interface: str = "can0", bitrate: int = 1_000_000):
     """Bring up the CAN bus interface. Requires root privileges."""
@@ -28,9 +30,6 @@ def init_can_bus(interface: str = "can0", bitrate: int = 1_000_000):
             sys.exit(1)
     print(f"[CAN] {interface} is up at {bitrate} bps")
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
-import motor_controller as mc  # type: ignore
-
 class Robot:
     def __init__(self):
         self.current_mode = None
@@ -40,7 +39,7 @@ class Robot:
         robot_params.robot_timer = robot_params.RobotTimer()
 
         # Bring up CAN bus before accessing hardware
-        init_can_bus("can0")
+        init_can_bus("can0", 1_000_000)
 
         # Initialize hardware
         self.motor_controller = mc.MotorController.get_instance("can0")
