@@ -95,7 +95,7 @@ class Drivetrain:
     def stop(self):
         self.set_power(0, 0, 0, 0)
 
-    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=0.05):
+    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=0.2):
         now = time.monotonic()
         if now - self._last_telemetry_time < interval:
             return

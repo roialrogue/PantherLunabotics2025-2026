@@ -77,7 +77,8 @@ class TeleOp:
             print(f"[TeleOp] motor_controller.update() error: {e}")
 
         # Debug: print auger telemetry to check if motor responds on CAN
-        self.robot.auger.print_telemetry()
+        #self.robot.auger.print_telemetry()
+        self.robot.drivetrain.print_telemetry()
 
     def run_teleOp_step(self):
 
