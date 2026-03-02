@@ -47,10 +47,12 @@ class TeleOp:
         elif button == 'DPAD_UP':
             if is_pressed:
                 #Intake Auger
+                print("Intake Auger")
                 self.robot.auger.intake()
         elif button == 'DPAD_DOWN':
             if is_pressed:
                 #Outtake Auger
+                print("Outtake Auger")
                 self.robot.auger.outtake()
         elif button == 'DPAD_LEFT':
             if is_pressed:
