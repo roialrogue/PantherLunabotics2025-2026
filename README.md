@@ -1,5 +1,11 @@
 # Start Up commands
 
+## SSH into onboard rPi
+
+```bash
+ssh rmcnasa@100.76.221.110
+```
+
 ## Start venv on onboard server
 
 ```bash
