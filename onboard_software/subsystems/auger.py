@@ -54,7 +54,7 @@ class Auger:
     def stop_logging(self):
         self._logger.stop_logging()
 
-    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=0.2):
+    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=1):
         now = time.monotonic()
         if now - self._last_telemetry_time < interval:
             return
