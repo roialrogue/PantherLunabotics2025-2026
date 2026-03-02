@@ -28,22 +28,22 @@ class TeleOp:
             if is_pressed:
                 #Strafe right
                 if robot_params.RobotConfig.useDrivetrain:
-                    self.robot.drivetrain.set_power(0.5,0.5,-0.5,-0.5)
+                    self.robot.drivetrain.set_power(-0.5,-0.5,0.5,0.5)
         elif button == 'X':
             if is_pressed:
                 #Strafe left
                 if robot_params.RobotConfig.useDrivetrain:
-                    self.robot.drivetrain.set_power(-0.5,-0.5,0.5,0.5)
+                    self.robot.drivetrain.set_power(0.5,0.5,-0.5,-0.5)
         elif button == 'LB':
             if is_pressed:
                 #Turn left
                 if robot_params.RobotConfig.useDrivetrain:
-                    self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
+                    self.robot.drivetrain.set_power(-0.5,0.5,-0.5,0.5)
         elif button == 'RB':
             if is_pressed:
                 #Turn right
                 if robot_params.RobotConfig.useDrivetrain:
-                    self.robot.drivetrain.set_power(-0.5,0.5,-0.5,0.5)
+                    self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
         elif button == 'DPAD_UP':
             if is_pressed:
                 #Intake Auger
@@ -78,7 +78,7 @@ class TeleOp:
 
         # Debug: print auger telemetry to check if motor responds on CAN
         #self.robot.auger.print_telemetry()
-        self.robot.drivetrain.print_telemetry()
+        #self.robot.drivetrain.print_telemetry()
 
     def run_teleOp_step(self):
 
