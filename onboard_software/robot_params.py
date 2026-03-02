@@ -7,8 +7,8 @@ import time
 robot_timer = None
 
 class RobotConfig:
-    useDrivetrain = False
-    useAuger = False
+    useDrivetrain = True
+    useAuger = True
 
 class LoopConfig:
     UPDATE_RATE_HZ = 50  # Change this to adjust loop frequency

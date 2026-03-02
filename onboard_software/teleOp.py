@@ -73,8 +73,8 @@ class TeleOp:
         # Update motor controller
         try:
             self.robot.motor_controller.update()
-        except RuntimeError:
-            pass
+        except RuntimeError as e:
+            print(f"[TeleOp] motor_controller.update() error: {e}")
 
     def run_teleOp_step(self):
 
