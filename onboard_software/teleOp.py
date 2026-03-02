@@ -76,6 +76,9 @@ class TeleOp:
         except RuntimeError as e:
             print(f"[TeleOp] motor_controller.update() error: {e}")
 
+        # Debug: print auger telemetry to check if motor responds on CAN
+        self.robot.auger.print_telemetry()
+
     def run_teleOp_step(self):
 
         # Update periodic loop

@@ -7,6 +7,9 @@ from library import telemetry_logger
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
 import motor_controller  # type: ignore
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from library import telemetry_logger
+
 # Subsystem Parameters
 logTelemetryData = False
 
