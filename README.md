@@ -37,9 +37,8 @@ python control.py
 # TODO:
 
 # Phase 1: TeleOp/Gen:
-1. Just run the robot and generally verify everything is working
-2. Test new motor directions for DT
-3. Slove drive math for joysticks
+1. Commit on the robot (forgot to do that)
+2. Slove drive math for joysticks
 
 4. Jetson?
 5. Clean up client server code (Do we need telemetry)
