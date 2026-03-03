@@ -35,6 +35,8 @@ class Auger:
         config.smart_current_stall_limit = 80.0
 
         self.mc.initialize_motor(self.motor_id, config)
+        self.mc.reset_motor_position(self.motor_id)
+        self.start_logging()
 
     def set_power(self, power):
         self.mc.set_motor_duty_cycle(self.motor_id, power)

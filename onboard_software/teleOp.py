@@ -66,7 +66,6 @@ class TeleOp:
 
     """Called at 50Hz — put all periodic tasks here."""
     def periodic_loop(self):
-        self.robot.auger.start_logging()
         #if robot_params.RobotConfig.useDrivetrain:
         #    self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
         
@@ -77,7 +76,7 @@ class TeleOp:
             print(f"[TeleOp] motor_controller.update() error: {e}")
 
         # Debug: print auger telemetry to check if motor responds on CAN
-        #self.robot.auger.print_telemetry()
+        self.robot.auger.print_telemetry(False, False, False, True, False, True, interval=0.2)
         #self.robot.drivetrain.print_telemetry()
 
     def run_teleOp_step(self):

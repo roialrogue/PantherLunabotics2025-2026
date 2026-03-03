@@ -57,6 +57,8 @@ class Drivetrain:
 
         self.mc.initialize_motors(self.left_motor_ids, configL)
         self.mc.initialize_motors(self.right_motor_ids, configR)
+        for motor_id in self.left_motor_ids + self.right_motor_ids:
+            self.mc.reset_motor_position(motor_id)
 
     def start_logging(self):
         self._logger.start_logging(_LOG_COLUMNS)
