@@ -1,4 +1,5 @@
 import os
+import csv
 import datetime
 
 
@@ -12,7 +13,8 @@ class TelemetryLogger:
         logger.log_row("[T+00:01.00]", [120.4, 2.1])
         logger.stop_logging()
 
-    Output is a markdown table suitable for spreadsheet import.
+    Output is CSV — open the file in any spreadsheet app and each
+    value lands in its own cell automatically.
     """
 
     def __init__(self, name: str, log_dir: str = None):
@@ -28,6 +30,7 @@ class TelemetryLogger:
             self.log_dir = log_dir
 
         self._file = None
+        self._writer = None
         self._filepath = None
         self._row_count = 0
 
@@ -37,7 +40,7 @@ class TelemetryLogger:
 
     def start_logging(self, columns: list):
         """
-        Open a new log file and write the markdown table header.
+        Open a new CSV log file and write the header row.
 
         columns: ordered list of column header strings, e.g.
                  ["Duty Cycle", "Velocity (RPM)", "Position (ticks)"]
@@ -48,35 +51,22 @@ class TelemetryLogger:
 
         os.makedirs(self.log_dir, exist_ok=True)
 
-        now = datetime.datetime.now()
-        date_str = now.strftime("%Y-%m-%d %H:%M:%S")
-        file_tag = now.strftime("%Y-%m-%d_%H-%M-%S")
-        filename = f"{self.name}_{file_tag}.md"
+        file_tag = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"{self.name}_{file_tag}.csv"
         self._filepath = os.path.join(self.log_dir, filename)
 
-        self._file = open(self._filepath, 'w', encoding='utf-8')
+        self._file = open(self._filepath, 'w', newline='', encoding='utf-8')
+        self._writer = csv.writer(self._file)
         self._row_count = 0
 
-        all_columns = ["Timestamp"] + columns
-        header_row = "| " + " | ".join(all_columns) + " |"
-        sep_row = "|" + "|".join(
-            ":---------:" if i > 0 else "-----------"
-            for i in range(len(all_columns))
-        ) + "|"
-
-        self._file.write(f"# {self.name.capitalize()} Telemetry Log\n")
-        self._file.write(f"- Date: {date_str}\n")
-        self._file.write(f"- Log file: {filename}\n")
-        self._file.write("\n")
-        self._file.write(header_row + "\n")
-        self._file.write(sep_row + "\n")
+        self._writer.writerow(["Timestamp"] + columns)
         self._file.flush()
 
         print(f"[{self.name.capitalize()}] Logging started -> {self._filepath}")
 
     def log_row(self, timestamp: str, values: list):
         """
-        Write one data row to the log table.
+        Write one data row to the CSV log.
 
         timestamp: string from robot_params.robot_timer.timestamp()
         values:    list of raw numbers matching the column order from start_logging()
@@ -84,9 +74,7 @@ class TelemetryLogger:
         if self._file is None:
             return
 
-        cells = [timestamp] + [str(v) for v in values]
-        row = "| " + " | ".join(cells) + " |"
-        self._file.write(row + "\n")
+        self._writer.writerow([timestamp] + [str(v) for v in values])
         self._file.flush()
         self._row_count += 1
 
@@ -95,9 +83,9 @@ class TelemetryLogger:
         if self._file is None:
             return
 
-        self._file.write(f"\n*Session ended — {self._row_count} rows recorded*\n")
         self._file.close()
         self._file = None
+        self._writer = None
 
         print(f"[{self.name.capitalize()}] Logging stopped — {self._row_count} rows saved to {self._filepath}")
         self._filepath = None

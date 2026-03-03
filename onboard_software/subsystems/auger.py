@@ -45,14 +45,15 @@ class Auger:
     def outtake(self):
         self.set_power(-0.25)
 
-    def stop(self):
-        self.set_power(0.0)
-
     def start_logging(self):
         self._logger.start_logging(_LOG_COLUMNS)
 
     def stop_logging(self):
         self._logger.stop_logging()
+
+    def stop(self):
+        self.set_power(0.0)
+        self.stop_logging()
 
     def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=1):
         now = time.monotonic()
