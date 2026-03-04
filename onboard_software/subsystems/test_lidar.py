@@ -53,6 +53,11 @@ from adafruit_rplidar import RPLidar
 PORT_NAME = '/dev/ttyUSB0'
 lidar = RPLidar(None, PORT_NAME)
 
+try:
+    lidar.set_motor_pwm(600)  # safe value
+except:
+    pass
+
 scan_data = [0]*360
 
 GRID_W = 80   # terminal width
