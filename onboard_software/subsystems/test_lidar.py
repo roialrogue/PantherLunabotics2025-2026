@@ -1,7 +1,7 @@
 import math
 import pygame
 import time
-from pyrplidar import PyRPlidar
+from adafruit_rplidar import RPLidar
 
 # -------------------------------
 # Configuration
@@ -42,42 +42,38 @@ def radar_continuous_map():
     font_small = pygame.font.SysFont(None, 20)
     font_title = pygame.font.SysFont(None, 28, bold=True)
 
-    # Create a static surface for persistent map
+    # Create a persistent surface for points
     radar_surface = pygame.Surface((WIDTH, HEIGHT))
     radar_surface.fill(BLACK)
 
-    # Draw reference circles ONCE
+    # Draw reference circles once
     for r in range(500, MAX_DISTANCE + 1, 500):
         pygame.draw.circle(radar_surface, DARK_GREEN, CENTER, int(r * SCALE), 1)
         label = font_small.render(f"{r//10} cm", True, WHITE)
-        screen.blit(label, (CENTER[0] + int(r * SCALE) - 25, CENTER[1]))
+        radar_surface.blit(label, (CENTER[0] + int(r * SCALE) - 25, CENTER[1]))
 
     # -------------------------------
     # Connect to LIDAR
     # -------------------------------
-    lidar = PyRPlidar()
-    lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
-    lidar.set_motor_pwm(500)
-    time.sleep(2)  # let motor stabilize
-
-    scan_generator = lidar.scan()  # returns multiple points per call
+    PORT_NAME = "/dev/ttyUSB0"
+    lidar = RPLidar(None, PORT_NAME)
+    time.sleep(1)  # small delay for motor to stabilize
 
     points = []
     running = True
     try:
-        for scan in scan_generator():
+        for scan in lidar.iter_scans():  # returns batches of points
             # Handle pygame events
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
 
-            # Collect all points from this batch
-            for measurement in scan:  # measurement has .angle, .distance
-                angle, distance = measurement.angle, measurement.distance
+            # Append all points from this batch
+            for (_, angle, distance) in scan:
                 if MIN_DISTANCE <= distance <= MAX_DISTANCE:
                     points.append((angle, distance))
 
-            # Draw points on radar_surface
+            # Draw all points on radar_surface
             for ang, dist in points:
                 px, py = polar_to_cartesian(ang, dist)
                 if dist <= 1000:
@@ -96,7 +92,7 @@ def radar_continuous_map():
             screen.blit(title_surface, (WIDTH // 2 - title_surface.get_width() // 2, HEIGHT - 40))
 
             pygame.display.flip()
-            clock.tick(60)  # 60 FPS
+            clock.tick(60)
 
             if not running:
                 break
@@ -105,7 +101,6 @@ def radar_continuous_map():
         print("\nStopped by user")
     finally:
         lidar.stop()
-        lidar.set_motor_pwm(0)
         lidar.disconnect()
         pygame.quit()
 
