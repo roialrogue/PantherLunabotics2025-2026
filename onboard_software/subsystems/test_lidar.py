@@ -24,10 +24,10 @@ WHITE = (255, 255, 255)
 # Helper function
 # -------------------------------
 def polar_to_cartesian(angle_deg, distance_mm):
-    angle_rad = math.radians(angle_deg)
+    angle_rad = math.radians((angle_deg + 180) % 360)
     r = distance_mm * SCALE
     x = CENTER[0] + int(r * math.cos(angle_rad))
-    y = CENTER[1] - int(r * math.sin(angle_rad))  # y-axis inverted in pygame
+    y = CENTER[1] + int(r * math.sin(angle_rad))  # y-axis inverted in pygame
     return x, y
 
 # -------------------------------
