@@ -1,20 +1,20 @@
-import sys
 import os
+import sys
 import time
 import robot_params
+from library import telemetry_logger
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
-import motor_controller # type: ignore
+import motor_controller  # type: ignore
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from library import telemetry_logger
 
 # Subsystem Parameters
+logTelemetryData = False
 
 # Note: if this is changed, update print data on line 86 as well
 _LOG_COLUMNS = ["Duty Cycle", "Velocity (RPM)", "Position (ticks)", "Current (A)", "Temp (°C)", "Bus Voltage (V)"]
-
-
 
 class Auger:
 
@@ -31,11 +31,12 @@ class Auger:
         config.ramp_rate = 0.0
         config.inverted = False
         config.motor_kv = 480
-        config.encoder_counts_per_rev = 4096
         config.smart_current_free_limit = 20.0
         config.smart_current_stall_limit = 80.0
 
         self.mc.initialize_motor(self.motor_id, config)
+        self.mc.reset_motor_position(self.motor_id)
+        self.start_logging()
 
     def set_power(self, power):
         self.mc.set_motor_duty_cycle(self.motor_id, power)
@@ -46,16 +47,17 @@ class Auger:
     def outtake(self):
         self.set_power(-0.25)
 
-    def stop(self):
-        self.set_power(0.0)
-
     def start_logging(self):
-        self._logger.start_logging(self._LOG_COLUMNS)
+        self._logger.start_logging(_LOG_COLUMNS)
 
     def stop_logging(self):
         self._logger.stop_logging()
 
-    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=True, voltage=True, interval=0.1):
+    def stop(self):
+        self.set_power(0.0)
+        self.stop_logging()
+
+    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=1):
         now = time.monotonic()
         if now - self._last_telemetry_time < interval:
             return

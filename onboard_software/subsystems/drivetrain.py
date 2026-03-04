@@ -1,12 +1,26 @@
-import sys
 import os
+import sys
 import time
 from library.util import Util
 import robot_params
 import math
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../library/motor_controller/build'))
-import motor_controller # type: ignore
+import motor_controller  # type: ignore
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from library import telemetry_logger
+
+# Subsystem Parameters
+logTelemetryData = False
+
+# Note: if this is changed, update log_row data in print_telemetry as well
+_LOG_COLUMNS = [
+    "FL Duty Cycle", "FL Velocity (RPM)", "FL Position (ticks)", "FL Current (A)", "FL Temp (°C)", "FL Bus Voltage (V)",
+    "BL Duty Cycle", "BL Velocity (RPM)", "BL Position (ticks)", "BL Current (A)", "BL Temp (°C)", "BL Bus Voltage (V)",
+    "FR Duty Cycle", "FR Velocity (RPM)", "FR Position (ticks)", "FR Current (A)", "FR Temp (°C)", "FR Bus Voltage (V)",
+    "BR Duty Cycle", "BR Velocity (RPM)", "BR Position (ticks)", "BR Current (A)", "BR Temp (°C)", "BR Bus Voltage (V)",
+]
 
 class Drivetrain:
 
@@ -16,34 +30,41 @@ class Drivetrain:
         self._last_telemetry_time = 0.0
 
         self.mc = mc
-        self.left_motor_ids = [7, 1] #Order: front left, back left
-        self.right_motor_ids = [4, 2] #back right, back left
+        self._logger = telemetry_logger.TelemetryLogger("drivetrain")
+        self.left_motor_ids = [7, 1] #front left, back left
+        self.right_motor_ids = [4, 2] #front right, back right
 
-        # This config is the same as default so techonically it is not needed.
-        config = motor_controller.MotorConfig() # left side motors
-        config.idle_mode = motor_controller.IdleMode.BRAKE
-        config.motor_type = motor_controller.MotorType.BRUSHLESS
-        config.sensor_type = motor_controller.SensorType.HALL_SENSOR
-        config.ramp_rate = 0.0
-        config.inverted = False
-        config.motor_kv = 480
-        config.encoder_counts_per_rev = 4096
-        config.smart_current_free_limit = 20.0
-        config.smart_current_stall_limit = 80.0
+        # This config is the same as default so technically it is not needed.
+        configL = motor_controller.MotorConfig() # left motors
+        configL.idle_mode = motor_controller.IdleMode.BRAKE
+        configL.motor_type = motor_controller.MotorType.BRUSHLESS
+        configL.sensor_type = motor_controller.SensorType.HALL_SENSOR
+        configL.ramp_rate = 0.0
+        configL.inverted = False
+        configL.motor_kv = 480
+        configL.smart_current_free_limit = 20.0
+        configL.smart_current_stall_limit = 80.0
 
-        config = motor_controller.MotorConfig() #right motors
-        config.idle_mode = motor_controller.IdleMode.BRAKE
-        config.motor_type = motor_controller.MotorType.BRUSHLESS
-        config.sensor_type = motor_controller.SensorType.HALL_SENSOR
-        config.ramp_rate = 0.0
-        config.inverted = True
-        config.motor_kv = 480
-        config.encoder_counts_per_rev = 4096
-        config.smart_current_free_limit = 20.0
-        config.smart_current_stall_limit = 80.0
+        configR = motor_controller.MotorConfig() #right motors
+        configR.idle_mode = motor_controller.IdleMode.BRAKE
+        configR.motor_type = motor_controller.MotorType.BRUSHLESS
+        configR.sensor_type = motor_controller.SensorType.HALL_SENSOR
+        configR.ramp_rate = 0.0
+        configR.inverted = True
+        configR.motor_kv = 480
+        configR.smart_current_free_limit = 20.0
+        configR.smart_current_stall_limit = 80.0
 
-        self.mc.initialize_motors(self.left_motor_ids, config)
-        self.mc.initialize_motors(self.right_motor_ids, config)
+        self.mc.initialize_motors(self.left_motor_ids, configL)
+        self.mc.initialize_motors(self.right_motor_ids, configR)
+        for motor_id in self.left_motor_ids + self.right_motor_ids:
+            self.mc.reset_motor_position(motor_id)
+
+    def start_logging(self):
+        self._logger.start_logging(_LOG_COLUMNS)
+
+    def stop_logging(self):
+        self._logger.stop_logging()
 
     def set_slow_turning(self, slow_turning):
         self.slow_turning = slow_turning
@@ -52,7 +73,6 @@ class Drivetrain:
         self.max_speed = max_speed
 
     def set_power(self, front_right_power, front_left_power, back_right_power, back_left_power):
-        print("setting power")
         self.mc.set_motor_duty_cycle(self.right_motor_ids[0], Util.clip(front_right_power, -self.max_speed, self.max_speed))
         self.mc.set_motor_duty_cycle(self.left_motor_ids[0], Util.clip(front_left_power, -self.max_speed, self.max_speed))
         self.mc.set_motor_duty_cycle(self.right_motor_ids[1], Util.clip(back_right_power, -self.max_speed, self.max_speed))
@@ -77,7 +97,7 @@ class Drivetrain:
     def stop(self):
         self.set_power(0, 0, 0, 0)
 
-    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=True, voltage=True, interval=0.1):
+    def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=1):
         now = time.monotonic()
         if now - self._last_telemetry_time < interval:
             return
@@ -90,8 +110,9 @@ class Drivetrain:
             ("BR", self.right_motor_ids[1]),
         ]
 
-        for label, motor_id in motors:
-            feedback = self.mc.get_motor_feedback(motor_id)
+        feedbacks = [(label, self.mc.get_motor_feedback(motor_id)) for label, motor_id in motors]
+
+        for label, feedback in feedbacks:
             parts = []
             if duty_cycle:
                 parts.append(f"Duty Cycle: {feedback.duty_cycle:.4f}")
@@ -107,3 +128,9 @@ class Drivetrain:
                 parts.append(f"Bus: {feedback.voltage:.2f} V")
             if parts:
                 print(f"{robot_params.robot_timer.timestamp()} [Drivetrain {label}] " + ", ".join(parts))
+
+        if self._logger.is_logging:
+            row = []
+            for _, fb in feedbacks:
+                row.extend([fb.duty_cycle, fb.velocity, fb.position, fb.current, fb.temperature, fb.voltage])
+            self._logger.log_row(robot_params.robot_timer.timestamp(), row)

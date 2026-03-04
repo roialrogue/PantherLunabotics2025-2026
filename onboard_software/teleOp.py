@@ -17,84 +17,67 @@ class TeleOp:
         if button == 'A':
             if is_pressed:
                 #Forward
-                #self.robot.drivetrain.set_power(-0.5,0.5,-0.5,0.5)
-                print("[TELEOP] A button pressed")
-            else:
-                print("[TELEOP] A button released")
-        elif button == 'B':
-            if is_pressed:
-                #strafe right
-                #self.robot.drivetrain.set_power(-0.5,0.5,0.5,-0.5)
-                print("[TELEOP] B button pressed")
-            else:
-                print("[TELEOP] B button released")
-        elif button == 'X':
-            if is_pressed:
-                #strafe left
-                #self.robot.drivetrain.set_power(0.5,-0.5,-0.5,0.5)
-                print("[TELEOP] X button pressed")
-            else:
-                print("[TELEOP] X button released")
+                if robot_params.RobotConfig.useDrivetrain:
+                    self.robot.drivetrain.set_power(0.5,0.5,0.5,0.5)
         elif button == 'Y':
             if is_pressed:
-                #backward
-                #self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
-                print("[TELEOP] Y button pressed")
-            else:
-                print("[TELEOP] Y button released")
+                #Backward
+                if robot_params.RobotConfig.useDrivetrain:
+                    self.robot.drivetrain.set_power(-0.5,-0.5,-0.5,-0.5)
+        elif button == 'B':
+            if is_pressed:
+                #Strafe right
+                if robot_params.RobotConfig.useDrivetrain:
+                    self.robot.drivetrain.set_power(-0.5,-0.5,0.5,0.5)
+        elif button == 'X':
+            if is_pressed:
+                #Strafe left
+                if robot_params.RobotConfig.useDrivetrain:
+                    self.robot.drivetrain.set_power(0.5,0.5,-0.5,-0.5)
         elif button == 'LB':
             if is_pressed:
                 #Turn left
-                #self.robot.drivetrain.set_power(-0.5,-0.5,-0.5,-0.5)
-                print("[TELEOP] LB button pressed")
-            else:
-                print("[TELEOP] LB button released")
+                if robot_params.RobotConfig.useDrivetrain:
+                    self.robot.drivetrain.set_power(-0.5,0.5,-0.5,0.5)
         elif button == 'RB':
             if is_pressed:
                 #Turn right
-                #self.robot.drivetrain.set_power(0.5,0.5,0.5,0.5)
-                print("[TELEOP] RB button pressed")
-            else:
-                print("[TELEOP] RB button released")
+                if robot_params.RobotConfig.useDrivetrain:
+                    self.robot.drivetrain.set_power(0.5,-0.5,0.5,-0.5)
         elif button == 'DPAD_UP':
             if is_pressed:
-                #Intake
+                #Intake Auger
+                print("Intake Auger")
                 self.robot.auger.intake()
-                print("[TELEOP] DPAD_UP pressed")
-            else:
-                print("[TELEOP] DPAD_UP released")
         elif button == 'DPAD_DOWN':
             if is_pressed:
-                #Outtake
+                #Outtake Auger
+                print("Outtake Auger")
                 self.robot.auger.outtake()
-                print("[TELEOP] DPAD_DOWN pressed")
-            else:
-                print("[TELEOP] DPAD_DOWN released")
         elif button == 'DPAD_LEFT':
             if is_pressed:
-                #Off
-                self.robot.drivetrain.set_power(0.0,0.0,0.0,0.0)
-                print("[TELEOP] DPAD_LEFT pressed")
-            else:
-                print("[TELEOP] DPAD_LEFT released")
+                #Off Drivetrain
+                if robot_params.RobotConfig.useDrivetrain:
+                    self.robot.drivetrain.set_power(0.0,0.0,0.0,0.0)
         elif button == 'DPAD_RIGHT':
             if is_pressed:
+                #Off Auger
                 self.robot.auger.stop()
-                print("[TELEOP] DPAD_RIGHT pressed")
-            else:
-                print("[TELEOP] DPAD_RIGHT released")
 
     """Called at 50Hz — put all periodic tasks here."""
     def periodic_loop(self):
-
-        #self.robot.drivetrain.set_power(0.1, 0.1, 0.1, 0.1)
-        #self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
+        #if robot_params.RobotConfig.useDrivetrain:
+        #    self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
         
         # Update motor controller
         try:
             self.robot.motor_controller.update()
         except RuntimeError as e:
-            print(f"[TeleOp] CAN error: {e}")
+            print(f"[TeleOp] motor_controller.update() error: {e}")
+
+        # Debug: print auger telemetry to check if motor responds on CAN
+        self.robot.auger.print_telemetry(False, False, False, True, False, True, interval=0.2)
+        #self.robot.drivetrain.print_telemetry()
 
     def run_teleOp_step(self):
 

@@ -1,7 +1,14 @@
 # RobotParams
-# Stores all constants and configs used acrooss the robot codebase.
+# Stores all constants and configs used across the robot codebase.
 
 import time
+
+# Global timer instance to be initialized by robot.py on startup
+robot_timer = None
+
+class RobotConfig:
+    useDrivetrain = False
+    useAuger = True
 
 class LoopConfig:
     UPDATE_RATE_HZ = 50  # Change this to adjust loop frequency
@@ -24,6 +31,3 @@ class RobotTimer:
         minutes = int(e) // 60
         seconds = e % 60
         return f"[T+{minutes:02d}:{seconds:05.2f}]"
-
-# Global timer instance to be initialized by robot.py on startup
-robot_timer: RobotTimer | None = None

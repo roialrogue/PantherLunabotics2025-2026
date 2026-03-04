@@ -1,4 +1,4 @@
-import time;
+import time
 from dataclasses import dataclass
 from library.util import Util
 
@@ -51,6 +51,7 @@ class PIDController:
         self.error = 0.0
         self.target_sign = 0.0
         self.output = 0.0
+        self.integral_error = 0.0
 
         # OnTarget variables
         self.settlingStartTime = 0.0
@@ -74,6 +75,7 @@ class PIDController:
         self.error = 0.0
         self.target_sign = 0.0
         self.output = 0.0
+        self.integral_error = 0.0
         # OnTarget variables
         self.settlingStartTime = 0.0
         self.timeoutStartTime = 0.0
@@ -107,7 +109,7 @@ class PIDController:
 
     def setTimeout(self, timeout):
         self.timeout = timeout
-        self.timeoutStartTime = time.time()
+        self.timeoutStartTime = time.monotonic()
 
     def resetTimeout(self):
         self.timeout = 0.0
@@ -116,7 +118,7 @@ class PIDController:
     def isOnTarget(self, tolerance, settlingTime):
         onTarget = False
 
-        current_time = time.time()
+        current_time = time.monotonic()
         abs_error = abs(self.error)
 
         if (self.no_oscillation):
@@ -125,7 +127,7 @@ class PIDController:
         elif (self.timeout > 0.0 and  current_time - self.timeoutStartTime >= self.timeout):
             onTarget = True
         elif (abs_error > tolerance):
-            self.settlingStartTime = time.time()
+            self.settlingStartTime = time.monotonic()
         elif (settlingTime == 0.0 or current_time >= self.settlingStartTime + settlingTime):
             onTarget = True
 
@@ -142,7 +144,7 @@ class PIDController:
 
         # Delta time calculation
         self.prevTimestamp = self.timestamp
-        self.timestamp = time.time()
+        self.timestamp = time.monotonic()
         delta_time = self.timestamp - self.prevTimestamp if self.prevTimestamp is not None else 0.0
         delta_error = (self.error - self.previous_error) / delta_time if delta_time > 0.0 else 0.0
 
@@ -155,13 +157,13 @@ class PIDController:
 
         # Integral error calculation with iZone consideration
         if (abs(self.error) > self.iZone):
-            integral_error = 0.0
+            self.integral_error = 0.0
         elif (self.ki != 0.0):
-            integral_error += self.error * delta_time
+            self.integral_error += self.error * delta_time
 
         # PIDF output calculation
         P_Term = self.kp * self.error
-        I_Term = self.ki * integral_error
+        I_Term = self.ki * self.integral_error
         D_Term = self.kd * delta_error
         F_Term = self.kf * target
 
@@ -171,7 +173,7 @@ class PIDController:
         return self.output
     
     def inputMod(self, error, lower_bound, upper_bound):
-        # Wrap input if its's above the manimum input
+        # Wrap input if its's above the minimum input
         numMax = int((error - lower_bound) / self.input_modulus)
         error -= numMax * self.input_modulus
 

@@ -32,8 +32,8 @@ struct MotorConfig
     SensorType sensorType = SensorType::kHallSensor;
     float rampRate = 0.0;
     bool inverted = false;
-    int motorKv = 480;
-    int encoderCountsPerRev = 4096;
+    int motorKv = 480; //Note 473 if running the NEO V1.1
+    int encoderCountsPerRev = 1;
     float smartCurrentFreeLimit = 20.0;
     float smartCurrentStallLimit = 80.0;
 };
@@ -104,10 +104,8 @@ public:
         motor.SetSmartCurrentStallLimit(config.smartCurrentStallLimit);
         motor.BurnFlash();
 
-        // Initialize desired duty cycle, feedback, and position offset to 0
-        //dutyCycles[motor_ID]      = 0.0f;
+        // Initialize position offset to 0
         positionOffsets[motor_ID] = 0.0f;
-        //motorFeedback[motor_ID]   = MotorFeedback{0.0f, 0.0f, 0.0f};
     }
 
     // Initialize multiple motors with the same configuration
@@ -231,6 +229,7 @@ public:
         positionOffsets[motor_ID] = connectedMotors.at(motor_ID).GetPosition();
     }
 
+    //Note: method very buggy
     // Read the configuration currently flashed on a SPARK MAX over CAN
     MotorConfig ReadMotorConfig(int motor_ID)
     {
