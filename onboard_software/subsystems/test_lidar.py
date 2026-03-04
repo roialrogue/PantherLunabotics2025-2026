@@ -1,107 +1,116 @@
-# import os
-# from math import cos, sin, pi, floor
-# import pygame
-# from adafruit_rplidar import RPLidar
-# # Set up pygame and the display
-# os.putenv('SDL_FBDEV', '/dev/fb1')
-# pygame.init()
-# lcd = pygame.display.set_mode((320,240))
-# pygame.mouse.set_visible(False)
-# lcd.fill((0,0,0))
-# pygame.display.update()
-# # Setup the RPLidar
-# PORT_NAME = '/dev/ttyUSB0'
-# lidar = RPLidar(None, PORT_NAME)
-# # used to scale data to fit on the screen
-# max_distance = 0
-
-# def process_data(data):
-#     global max_distance
-#     lcd.fill((0,0,0))
-#     for angle in range(360):
-#         distance = data[angle]
-#         if distance > 0: # ignore initially ungathered data points
-#             max_distance = max([min([5000, distance]), max_distance])
-#             radians = angle * pi / 180.0
-#             x = distance * cos(radians)
-#             y = distance * sin(radians)
-#             point = (160 + int(x / max_distance * 119), 120 + int(y / max_distance *
-#             119))
-#             lcd.set_at(point, pygame.Color(255, 255, 255))
-#     pygame.display.update()
-
-# scan_data = [0]*360
-
-# try:
-#     print(lidar.info)
-#     for scan in lidar.iter_scans():
-#         for (_, angle, distance) in scan:
-#             scan_data[min([359, floor(angle)])] = distance
-#         process_data(scan_data)
-# except KeyboardInterrupt:
-#     print('Stoping.')
-# lidar.stop()
-# lidar.disconnect()
-
-
-import os
+import math
+import pygame
 import time
-from math import cos, sin, pi, floor
-from adafruit_rplidar import RPLidar
+from pyrplidar import PyRPlidar
 
-# Setup the RPLidar
-PORT_NAME = '/dev/ttyUSB0'
-lidar = RPLidar(None, PORT_NAME)
+# -------------------------------
+# Configuration
+# -------------------------------
+WIDTH, HEIGHT = 800, 800
+CENTER = (WIDTH // 2, HEIGHT // 2)
+MIN_DISTANCE = 50      # mm
+MAX_DISTANCE = 3000    # mm
+SCALE = (WIDTH // 2) / MAX_DISTANCE
 
-try:
-    lidar.set_motor_pwm(600)  # safe value
-except:
-    pass
+# Colors
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+YELLOW = (255, 255, 0)
+RED = (255, 0, 0)
+DARK_GREEN = (0, 100, 0)
+WHITE = (255, 255, 255)
 
-scan_data = [0]*360
+# -------------------------------
+# Helper function
+# -------------------------------
+def polar_to_cartesian(angle_deg, distance_mm):
+    angle_rad = math.radians(angle_deg)
+    r = distance_mm * SCALE
+    x = CENTER[0] + int(r * math.cos(angle_rad))
+    y = CENTER[1] - int(r * math.sin(angle_rad))  # y-axis inverted in pygame
+    return x, y
 
-GRID_W = 80   # terminal width
-GRID_H = 40   # terminal height
-MAX_DIST = 4000  # max lidar distance to normalize
+# -------------------------------
+# Main radar function
+# -------------------------------
+def radar_continuous_map():
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("RPLidar Radar Map")
+    clock = pygame.time.Clock()
 
-def draw_ascii_map(data):
-    # Create blank ASCII grid
-    grid = [[" " for _ in range(GRID_W)] for _ in range(GRID_H)]
+    font_small = pygame.font.SysFont(None, 20)
+    font_title = pygame.font.SysFont(None, 28, bold=True)
 
-    for angle in range(360):
-        d = data[angle]
-        if d > 0:
-            # normalize distance [0..1]
-            d_norm = min(d, MAX_DIST) / MAX_DIST   
+    # Create a static surface for persistent map
+    radar_surface = pygame.Surface((WIDTH, HEIGHT))
+    radar_surface.fill(BLACK)
 
-            rad = angle * pi / 180
-            x = d_norm * cos(rad)
-            y = d_norm * sin(rad)
+    # Draw reference circles ONCE
+    for r in range(500, MAX_DISTANCE + 1, 500):
+        pygame.draw.circle(radar_surface, DARK_GREEN, CENTER, int(r * SCALE), 1)
+        label = font_small.render(f"{r//10} cm", True, WHITE)
+        screen.blit(label, (CENTER[0] + int(r * SCALE) - 25, CENTER[1]))
 
-            # convert to grid coords
-            gx = int((x + 1) * (GRID_W//2))
-            gy = int((1 - y) * (GRID_H//2))
+    # -------------------------------
+    # Connect to LIDAR
+    # -------------------------------
+    lidar = PyRPlidar()
+    lidar.connect(port="/dev/ttyUSB0", baudrate=115200, timeout=3)
+    lidar.set_motor_pwm(500)
+    time.sleep(2)  # let motor stabilize
 
-            if 0 <= gx < GRID_W and 0 <= gy < GRID_H:
-                grid[gy][gx] = "#"
+    scan_generator = lidar.scan()  # returns multiple points per call
 
-    # Clear terminal
-    os.system("clear")
+    points = []
+    running = True
+    try:
+        for scan in scan_generator():
+            # Handle pygame events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
 
-    # Print map
-    for row in grid:
-        print("".join(row))
+            # Collect all points from this batch
+            for measurement in scan:  # measurement has .angle, .distance
+                angle, distance = measurement.angle, measurement.distance
+                if MIN_DISTANCE <= distance <= MAX_DISTANCE:
+                    points.append((angle, distance))
 
-try:
-    print(lidar.info)
-    time.sleep(2)   
-    for scan in lidar.iter_scans():
-        for (_, angle, distance) in scan:
-            scan_data[min([359, floor(angle)])] = distance
+            # Draw points on radar_surface
+            for ang, dist in points:
+                px, py = polar_to_cartesian(ang, dist)
+                if dist <= 1000:
+                    color = RED
+                elif dist <= 2000:
+                    color = YELLOW
+                else:
+                    color = GREEN
+                pygame.draw.circle(radar_surface, color, (px, py), 2)
 
-        draw_ascii_map(scan_data)
+            # Blit radar_surface to screen
+            screen.blit(radar_surface, (0, 0))
 
-except KeyboardInterrupt:
-    print('Stopping.')
-    lidar.stop()
-    lidar.disconnect()
+            # Draw title
+            title_surface = font_title.render("RPLidar Radar Map", True, WHITE)
+            screen.blit(title_surface, (WIDTH // 2 - title_surface.get_width() // 2, HEIGHT - 40))
+
+            pygame.display.flip()
+            clock.tick(60)  # 60 FPS
+
+            if not running:
+                break
+
+    except KeyboardInterrupt:
+        print("\nStopped by user")
+    finally:
+        lidar.stop()
+        lidar.set_motor_pwm(0)
+        lidar.disconnect()
+        pygame.quit()
+
+# -------------------------------
+# Entry point
+# -------------------------------
+if __name__ == "__main__":
+    radar_continuous_map()
