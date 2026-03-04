@@ -45,6 +45,7 @@
 
 
 import os
+import time
 from math import cos, sin, pi, floor
 from adafruit_rplidar import RPLidar
 
@@ -88,6 +89,7 @@ def draw_ascii_map(data):
 
 try:
     print(lidar.info)
+    time.sleep(2)   
     for scan in lidar.iter_scans():
         for (_, angle, distance) in scan:
             scan_data[min([359, floor(angle)])] = distance
