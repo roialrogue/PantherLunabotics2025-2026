@@ -1,22 +1,3 @@
-# from rplidar import RPLidar
-# lidar = RPLidar('/dev/ttyUSB0')
-
-# info = lidar.get_info()
-# print(info)
-
-# health = lidar.get_health()
-# print(health)
-
-# for i, scan in enumerate(lidar.iter_scans()):
-#     print('%d: Got %d measurments' % (i, len(scan)))
-#     if i > 10:
-#         break
-
-# lidar.stop()
-# lidar.stop_motor()
-# lidar.disconnect()
-
-
 import math
 import pygame
 from rplidar import RPLidar
@@ -87,21 +68,26 @@ def radar_map():
                 if event.type == pygame.QUIT:
                     running = False
 
-            # Append all points from this scan
+            # Clear the radar surface each frame
+            radar_surface.fill(BLACK)
+
+            # Draw reference circles again
+            for r in range(500, MAX_DISTANCE + 1, 500):
+                pygame.draw.circle(radar_surface, DARK_GREEN, CENTER, int(r * SCALE), 1)
+                label = font_small.render(f"{r//10} cm", True, WHITE)
+                radar_surface.blit(label, (CENTER[0] + int(r * SCALE) - 25, CENTER[1]))
+
+            # Draw points from current scan only
             for (_, angle, distance) in scan:
                 if MIN_DISTANCE <= distance <= MAX_DISTANCE:
-                    points.append((angle, distance))
-
-            # Draw all points on radar_surface
-            for ang, dist in points:
-                px, py = polar_to_cartesian(ang, dist)
-                if dist <= 1000:
-                    color = RED
-                elif dist <= 2000:
-                    color = YELLOW
-                else:
-                    color = GREEN
-                pygame.draw.circle(radar_surface, color, (px, py), 2)
+                    px, py = polar_to_cartesian(angle, distance)
+                    if distance <= 1000:
+                        color = RED
+                    elif distance <= 2000:
+                        color = YELLOW
+                    else:
+                        color = GREEN
+                    pygame.draw.circle(radar_surface, color, (px, py), 2)
 
             # Blit radar surface to screen
             screen.blit(radar_surface, (0, 0))
