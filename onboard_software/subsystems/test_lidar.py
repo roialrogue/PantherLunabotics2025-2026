@@ -88,7 +88,7 @@ def radar_map():
                     else:
                         color = GREEN
                     pygame.draw.circle(radar_surface, color, (px, py), 2)
-                    #print(f"Point: angle={angle}, distance={distance}, quality={quality}, px={px}, py={py}")
+                    print(f"Point: angle={angle}, distance={distance}, quality={quality}, px={px}, py={py}")
 
             # Blit radar surface to screen
             screen.blit(radar_surface, (0, 0))
