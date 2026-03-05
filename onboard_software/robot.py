@@ -91,8 +91,8 @@ class Robot:
         print("[Robot] Stopping robot")
         self.running = False
         self.server.stop()
-        self.drivetrain.stop()
-        self.auger.stop()
+        self.drivetrain.shutdown()
+        self.auger.shutdown()
         
 if __name__ == "__main__":
     Robot().run()

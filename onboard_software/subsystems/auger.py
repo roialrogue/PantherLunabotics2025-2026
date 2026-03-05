@@ -55,6 +55,9 @@ class Auger:
 
     def stop(self):
         self.set_power(0.0)
+
+    def shutdown(self):
+        self.stop()
         self.stop_logging()
 
     def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=1):
@@ -84,8 +87,11 @@ class Auger:
 
         print(f"{robot_params.robot_timer.timestamp()} [Auger] " + ", ".join(parts))
 
-        if self._logger.is_logging:
-            self._logger.log_row(
-                [feedback.duty_cycle, feedback.velocity, feedback.position,
-                 feedback.current, feedback.temperature, feedback.voltage]
-            )
+    def log_data(self):
+        if not self._logger.is_logging:
+            return
+        feedback = self.mc.get_motor_feedback(self.motor_id)
+        self._logger.log_row(
+            [feedback.duty_cycle, feedback.velocity, feedback.position,
+             feedback.current, feedback.temperature, feedback.voltage]
+        )

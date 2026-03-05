@@ -72,6 +72,13 @@ class Drivetrain:
     def set_max_speed(self, max_speed):
         self.max_speed = max_speed
 
+    def stop(self):
+        self.set_power(0, 0, 0, 0)
+
+    def shutdown(self):
+        self.stop()
+        self.stop_logging()
+
     def set_power(self, front_right_power, front_left_power, back_right_power, back_left_power):
         self.mc.set_motor_duty_cycle(self.right_motor_ids[0], Util.clip(front_right_power, -self.max_speed, self.max_speed))
         self.mc.set_motor_duty_cycle(self.left_motor_ids[0], Util.clip(front_left_power, -self.max_speed, self.max_speed))
@@ -93,9 +100,6 @@ class Drivetrain:
         back_left_power = (y + x - turning) / denominator
 
         self.set_power(front_right_power, front_left_power, back_right_power, back_left_power)
-
-    def stop(self):
-        self.set_power(0, 0, 0, 0)
 
     def print_telemetry(self, duty_cycle=True, velocity=True, position=True, current=True, temperature=False, voltage=True, interval=1):
         now = time.monotonic()
@@ -129,8 +133,17 @@ class Drivetrain:
             if parts:
                 print(f"{robot_params.robot_timer.timestamp()} [Drivetrain {label}] " + ", ".join(parts))
 
-        if self._logger.is_logging:
-            row = []
-            for _, fb in feedbacks:
-                row.extend([fb.duty_cycle, fb.velocity, fb.position, fb.current, fb.temperature, fb.voltage])
-            self._logger.log_row(row)
+    def log_data(self):
+        if not self._logger.is_logging:
+            return
+        motors = [
+            ("FL", self.left_motor_ids[0]),
+            ("BL", self.left_motor_ids[1]),
+            ("FR", self.right_motor_ids[0]),
+            ("BR", self.right_motor_ids[1]),
+        ]
+        row = []
+        for _, motor_id in motors:
+            fb = self.mc.get_motor_feedback(motor_id)
+            row.extend([fb.duty_cycle, fb.velocity, fb.position, fb.current, fb.temperature, fb.voltage])
+        self._logger.log_row(row)
