@@ -133,4 +133,4 @@ class Drivetrain:
             row = []
             for _, fb in feedbacks:
                 row.extend([fb.duty_cycle, fb.velocity, fb.position, fb.current, fb.temperature, fb.voltage])
-            self._logger.log_row(robot_params.robot_timer.timestamp(), row)
+            self._logger.log_row(row)

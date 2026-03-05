@@ -86,7 +86,6 @@ class Auger:
 
         if self._logger.is_logging:
             self._logger.log_row(
-                robot_params.robot_timer.timestamp(),
                 [feedback.duty_cycle, feedback.velocity, feedback.position,
                  feedback.current, feedback.temperature, feedback.voltage]
             )

@@ -37,8 +37,9 @@ python control.py
 # TODO:
 
 # Phase 1: TeleOp/Gen:
-1. Commit on the robot (forgot to do that)
-2. Slove drive math for joysticks
+1. Test new data collect loger
+2. Setup hotspot internet
+3. Slove drive math for joysticks
 
 4. Jetson?
 5. Clean up client server code (Do we need telemetry)
