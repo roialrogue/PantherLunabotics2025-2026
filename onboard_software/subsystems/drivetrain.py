@@ -79,7 +79,7 @@ class Drivetrain:
         self.mc.set_motor_duty_cycle(self.left_motor_ids[1], Util.clip(back_left_power, -self.max_speed, self.max_speed))
 
     def drive_task(self, y_axis, x_axis, turning_axis):
-        y = -(math.atan(5 * y_axis) / math.atan(5)) #Note: negative
+        y = (math.atan(5 * y_axis) / math.atan(5))
         x = (math.atan(5 * x_axis) / math.atan(5)) * 1.1 # Strafing compensation
         turning = (math.atan(5 * turning_axis) / math.atan(5))
 
@@ -87,10 +87,10 @@ class Drivetrain:
             turning *= 0.5 # Slow down turning
 
         denominator = max(abs(y) + abs(x) + abs(turning), 1)
-        front_right_power = (y - x - turning) / denominator
-        front_left_power = (y + x + turning) / denominator
-        back_right_power = (y + x - turning) / denominator
-        back_left_power = (y - x + turning) / denominator
+        front_right_power = (y - x + turning) / denominator
+        front_left_power = (y - x - turning) / denominator
+        back_right_power = (y + x + turning) / denominator
+        back_left_power = (y + x - turning) / denominator
 
         self.set_power(front_right_power, front_left_power, back_right_power, back_left_power)
 

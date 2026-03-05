@@ -66,8 +66,8 @@ class TeleOp:
 
     """Called at 50Hz — put all periodic tasks here."""
     def periodic_loop(self):
-        #if robot_params.RobotConfig.useDrivetrain:
-        #    self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
+        if robot_params.RobotConfig.useDrivetrain:
+            self.robot.drivetrain.drive_task(self.robot.controller.AxisValues['LY'], self.robot.controller.AxisValues['LX'], self.robot.controller.AxisValues['RX'])
         
         # Update motor controller
         try:
