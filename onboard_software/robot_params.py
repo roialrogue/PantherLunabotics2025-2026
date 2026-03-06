@@ -7,7 +7,7 @@ import time
 robot_timer = None
 
 class RobotConfig:
-    useDrivetrain = False
+    useDrivetrain = True
     useAuger = True
 
 class LoopConfig:
