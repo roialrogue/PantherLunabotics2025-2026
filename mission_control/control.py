@@ -43,11 +43,6 @@ class Control:
         self.joystick.init()
         print("[Control] 🎮 Controller connected!")
 
-    def print_telemetry(self):
-        telemetry = self.client.get_telemetry()
-        if telemetry is not None:
-            print(f"[Control] \033[35mTelemetry\033[0m: {telemetry}")
-
     def run(self):
         self.client_t = threading.Thread(target=self.client.connect)
         self.client_t.start()

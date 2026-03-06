@@ -37,11 +37,10 @@ python control.py
 # TODO:
 
 # Phase 1: TeleOp/Gen:
-1. Test new data collect loger
-2. Setup hotspot internet
-3. Slove drive math for joysticks
+1. Fix joysticks stick drift and check driveing with joysticks
+2. Setup new jetson
+3. Setup vision streaming for camera and Lidar throught ssh
 
-4. Jetson?
 5. Clean up client server code (Do we need telemetry)
 
 # Phase 2: Auto/Automations:

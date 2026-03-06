@@ -2,6 +2,7 @@
 # Stores all constants and configs used across the robot codebase.
 
 import time
+import inspect
 
 # Global timer instance to be initialized by robot.py on startup
 robot_timer = None
@@ -31,3 +32,17 @@ class RobotTimer:
         minutes = int(e) // 60
         seconds = e % 60
         return f"[T+{minutes:02d}:{seconds:05.2f}]"
+
+class Telemetry:
+    PRINTS_PER_SECOND = 10  # Change this to adjust how often telemetry prints per second
+    _timers = {}  # Per-call-site timers keyed by (filename, lineno)
+
+    @classmethod
+    def print_t(cls, *args, prints_per_second=PRINTS_PER_SECOND, **kwargs):
+        period = 1.0 / prints_per_second
+        frame = inspect.stack()[1]
+        key = (frame.filename, frame.lineno)
+        now = time.monotonic()
+        if now - cls._timers.get(key, 0.0) >= period:
+            print(*args, **kwargs)
+            cls._timers[key] = now
