@@ -42,10 +42,10 @@ class Auger:
         self.mc.set_motor_duty_cycle(self.motor_id, power)
 
     def intake(self):
-        self.set_power(0.25)
+        self.set_power(0.5)
 
     def outtake(self):
-        self.set_power(-0.25)
+        self.set_power(-0.5)
 
     def start_logging(self):
         self._logger.start_logging(_LOG_COLUMNS)
