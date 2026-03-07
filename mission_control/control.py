@@ -67,7 +67,6 @@ class Control:
                         self.client.send_command("SHUTDOWN")
                         self.stop()
                         return
-            self.print_telemetry()
             time.sleep(0.05) # 20 Hz loop
 
         # Prevent A/B release events from leaking into control loop
@@ -152,7 +151,6 @@ class Control:
                 self.client.send_command(commands)
                 last_command = commands
                 #print(commands)
-            self.print_telemetry()
             time.sleep(0.05) # 20 Hz loop
 
     def stop(self):

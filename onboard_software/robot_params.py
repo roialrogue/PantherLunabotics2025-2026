@@ -2,12 +2,15 @@
 # Stores all constants and configs used across the robot codebase.
 
 import time
-import inspect
+import sys
 
 # Global timer instance to be initialized by robot.py on startup
 robot_timer = None
 
 class RobotConfig:
+    useRiLidarRemoteStream = True
+    useCameraRemoteStream = True
+
     useDrivetrain = False
     useAuger = True
 
@@ -40,8 +43,8 @@ class Telemetry:
     @classmethod
     def print_t(cls, *args, prints_per_second=PRINTS_PER_SECOND, **kwargs):
         period = 1.0 / prints_per_second
-        frame = inspect.stack()[1]
-        key = (frame.filename, frame.lineno)
+        frame = sys._getframe(1)
+        key = (frame.f_code.co_filename, frame.f_lineno)
         now = time.monotonic()
         if now - cls._timers.get(key, 0.0) >= period:
             print(*args, **kwargs)

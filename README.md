@@ -41,7 +41,7 @@ python control.py
 2. Setup new jetson
 3. Setup vision streaming for camera and Lidar throught ssh
 
-5. Clean up client server code (Do we need telemetry)
+4. Optimze clint server code 
 
 # Phase 2: Auto/Automations:
 1. Figure out all the required sensor for auto and how to use all of them
