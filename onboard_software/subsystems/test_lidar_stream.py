@@ -1,4 +1,3 @@
-import argparse
 import io
 import math
 import os
@@ -6,8 +5,13 @@ import socket
 import struct
 import time
 
-# pygame import is deferred so we can set SDL env vars first
+from PIL import Image
 from rplidar import RPLidar
+
+# SDL must be configured before importing pygame
+os.environ['SDL_VIDEODRIVER'] = 'dummy'
+os.environ['SDL_AUDIODRIVER'] = 'dummy'
+import pygame
 
 # -------------------------------
 # Configuration
@@ -28,7 +32,7 @@ DARK_GREEN = (0, 100, 0)
 WHITE = (255, 255, 255)
 
 # -------------------------------
-# Helper function
+# Helper functions
 # -------------------------------
 def polar_to_cartesian(angle_deg, distance_mm):
     angle_rad = math.radians((angle_deg + 180) % 360)
@@ -37,12 +41,8 @@ def polar_to_cartesian(angle_deg, distance_mm):
     y = CENTER[1] + int(r * math.sin(angle_rad))
     return x, y
 
-# -------------------------------
-# Frame encoding
-# -------------------------------
 def encode_frame(surface):
     """Encode a pygame surface as JPEG bytes."""
-    from PIL import Image
     arr = pygame.surfarray.array3d(surface)
     arr = arr.transpose(1, 0, 2)  # (w,h,3) -> (h,w,3) for PIL
     img = Image.fromarray(arr, 'RGB')
@@ -55,69 +55,49 @@ def send_frame(conn, frame_bytes):
     header = struct.pack('>I', len(frame_bytes))
     conn.sendall(header + frame_bytes)
 
+def build_static_overlay(font_small, font_title):
+    """Pre-render reference circles and title onto a surface (drawn once)."""
+    overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    for r in range(500, MAX_DISTANCE + 1, 500):
+        pygame.draw.circle(overlay, DARK_GREEN, CENTER, int(r * SCALE), 1)
+        label = font_small.render(f"{r // 10} cm", True, WHITE)
+        overlay.blit(label, (CENTER[0] + int(r * SCALE) - 25, CENTER[1]))
+    title = font_title.render("RPLidar Radar Map", True, WHITE)
+    overlay.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT - 40))
+    return overlay
+
 # -------------------------------
 # Main radar function
 # -------------------------------
-def radar_map(stream=False):
-    global pygame
-
-    if stream:
-        os.environ['SDL_VIDEODRIVER'] = 'dummy'
-        os.environ['SDL_AUDIODRIVER'] = 'dummy'
-
-    import pygame as _pygame
-    pygame = _pygame
-
+def radar_map():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    if not stream:
-        pygame.display.set_caption("RPLidar Radar Map")
-    clock = pygame.time.Clock()
     font_small = pygame.font.SysFont(None, 20)
     font_title = pygame.font.SysFont(None, 28, bold=True)
 
-    radar_surface = pygame.Surface((WIDTH, HEIGHT))
-    radar_surface.fill(BLACK)
+    static_overlay = build_static_overlay(font_small, font_title)
 
-    # -------------------------------
-    # Set up streaming socket (if --stream)
-    # -------------------------------
-    conn = None
-    if stream:
-        server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server_sock.bind(('0.0.0.0', STREAM_PORT))
-        server_sock.listen(1)
-        print(f"Streaming server listening on port {STREAM_PORT} — waiting for viewer to connect...")
-        conn, addr = server_sock.accept()
-        print(f"Viewer connected from {addr}")
+    # Set up streaming socket
+    server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_sock.bind(('0.0.0.0', STREAM_PORT))
+    server_sock.listen(1)
+    print(f"Streaming server listening on port {STREAM_PORT} — waiting for viewer to connect...")
+    conn, addr = server_sock.accept()
+    print(f"Viewer connected from {addr}")
 
-    # -------------------------------
     # Connect to LIDAR
-    # -------------------------------
     PORT_NAME = '/dev/ttyUSB0'
     lidar = RPLidar(PORT_NAME)
     time.sleep(2)  # let motor stabilize
 
-    running = True
     try:
         for scan in lidar.iter_scans():
-            if not stream:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-
-            # Clear the radar surface each frame
-            radar_surface.fill(BLACK)
-
-            # Draw reference circles
-            for r in range(500, MAX_DISTANCE + 1, 500):
-                pygame.draw.circle(radar_surface, DARK_GREEN, CENTER, int(r * SCALE), 1)
-                label = font_small.render(f"{r//10} cm", True, WHITE)
-                radar_surface.blit(label, (CENTER[0] + int(r * SCALE) - 25, CENTER[1]))
+            screen.fill(BLACK)
+            screen.blit(static_overlay, (0, 0))
 
             # Draw scan points
-            for (quality, angle, distance) in scan:
+            for _, angle, distance in scan:
                 if MIN_DISTANCE <= distance <= MAX_DISTANCE:
                     px, py = polar_to_cartesian(angle, distance)
                     if distance <= 1000:
@@ -126,23 +106,12 @@ def radar_map(stream=False):
                         color = YELLOW
                     else:
                         color = GREEN
-                    pygame.draw.circle(radar_surface, color, (px, py), 2)
+                    pygame.draw.circle(screen, color, (px, py), 2)
 
-            screen.blit(radar_surface, (0, 0))
-            title_surface = font_title.render("RPLidar Radar Map", True, WHITE)
-            screen.blit(title_surface, (WIDTH // 2 - title_surface.get_width() // 2, HEIGHT - 40))
-
-            if stream:
-                try:
-                    send_frame(conn, encode_frame(screen))
-                except (BrokenPipeError, ConnectionResetError):
-                    print("Viewer disconnected.")
-                    break
-            else:
-                pygame.display.flip()
-                clock.tick(60)
-
-            if not running:
+            try:
+                send_frame(conn, encode_frame(screen))
+            except (BrokenPipeError, ConnectionResetError):
+                print("Viewer disconnected.")
                 break
 
     except KeyboardInterrupt:
@@ -152,17 +121,11 @@ def radar_map(stream=False):
         lidar.stop_motor()
         lidar.disconnect()
         pygame.quit()
-        if conn:
-            conn.close()
-        if stream:
-            server_sock.close()
+        conn.close()
+        server_sock.close()
 
 # -------------------------------
 # Entry point
 # -------------------------------
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--stream', action='store_true',
-                        help='Stream frames over TCP instead of displaying locally')
-    args = parser.parse_args()
-    radar_map(stream=args.stream)
+    radar_map()
